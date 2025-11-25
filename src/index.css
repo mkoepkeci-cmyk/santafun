@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Philosopher:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Crimson Pro', 'Georgia', serif;
+  background: linear-gradient(135deg, #1C4428 0%, #0F2419 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Snowflake animation */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px) rotate(360deg);
+    opacity: 0.1;
+  }
+}
+
+.snowflake {
+  position: fixed;
+  top: -10vh;
+  color: white;
+  font-size: 1em;
+  animation: snowfall linear infinite;
+  z-index: 0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Philosopher', 'Georgia', serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+p, li, span {
+  font-family: 'Crimson Pro', 'Georgia', serif;
+  line-height: 1.7;
+}
+
+/* Button styles */
+@layer components {
+  .btn-primary {
+    @apply text-white font-bold py-3 px-8 rounded-xl shadow-2xl transform transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed;
+    font-family: 'Philosopher', serif;
+    letter-spacing: 0.05em;
+    background: linear-gradient(to right, #8B2635, #B8312F);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(to right, #B8312F, #D4534D);
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+  }
+
+  .btn-secondary {
+    @apply text-white font-semibold py-2 px-5 rounded-lg shadow-xl transform transition-all duration-300 hover:scale-105;
+    font-family: 'Philosopher', serif;
+    background: linear-gradient(to right, #3A5F4B, #2D5F3F);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(to right, #2D5F3F, #1C4428);
+  }
+
+  .input-field {
+    @apply w-full px-5 py-4 rounded-xl text-gray-800 text-lg shadow-lg transition-all duration-300;
+    font-family: 'Crimson Pro', serif;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border: 2px solid #D4AF37;
+  }
+
+  .input-field:focus {
+    outline: none;
+    ring: 4px;
+    ring-color: rgba(212, 175, 55, 0.3);
+    border-color: #8B2635;
+  }
+
+  .room-card {
+    @apply rounded-2xl shadow-2xl p-10 max-w-5xl mx-auto;
+    background: linear-gradient(to bottom right, white, rgba(255, 248, 231, 0.3));
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(28, 68, 40, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8B2635, #B8312F);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #B8312F, #D4534D);
+}
+
+/* Glass morphism effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Warm glow effect */
+.warm-glow {
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.3), 0 0 80px rgba(184, 49, 47, 0.2);
+}

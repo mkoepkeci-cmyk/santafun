@@ -1,0 +1,135 @@
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+export const useGameStore = create(
+  persist(
+    (set, get) => ({
+      // Game state
+      teamName: '',
+      currentRoom: -1, // -1 = intro story, 0 = team name, 1-5 = rooms, 6 = completion
+      timeRemaining: 3600, // 60 minutes in seconds
+      startTime: null,
+      completionTime: null,
+      gameStarted: false,
+      viewedIntro: false,
+      
+      // Hints tracking
+      hintsUsed: {
+        room1: 0,
+        room2: 0,
+        room3: 0,
+        room4: 0,
+        room5: 0
+      },
+      
+      // Answers submitted
+      answers: {
+        room1: '',
+        room2: '',
+        room3: '',
+        room4: '',
+        room5: ''
+      },
+
+      // Actions
+      setTeamName: (name) => set({ teamName: name }),
+      
+      proceedToTeamEntry: () => set({
+        currentRoom: 0,
+        viewedIntro: true
+      }),
+
+      startGame: () => set({
+        gameStarted: true,
+        currentRoom: 1,
+        startTime: null  // Will be set when they click "Begin Mission"
+      }),
+
+      nextRoom: () => set((state) => {
+        const updates = { currentRoom: state.currentRoom + 1 }
+        // Start timer when moving from intro (room 1 with no startTime) to actual room 1
+        if (state.currentRoom === 1 && !state.startTime) {
+          updates.startTime = Date.now()
+        }
+        return updates
+      }),
+
+      // Development tool: Jump to any room
+      goToRoom: (roomNumber) => set((state) => {
+        const updates = { currentRoom: roomNumber }
+        // Start timer if jumping to a puzzle room and timer hasn't started
+        if (roomNumber >= 1 && roomNumber <= 5 && !state.startTime) {
+          updates.startTime = Date.now()
+        }
+        return updates
+      }),
+      
+      completeGame: () => {
+        const state = get()
+        const timeTaken = Math.floor((Date.now() - state.startTime) / 1000)
+        set({ 
+          currentRoom: 6,
+          completionTime: timeTaken
+        })
+      },
+      
+      decrementTime: () => set((state) => {
+        const newTime = state.timeRemaining - 1
+        if (newTime <= 0) {
+          // Time's up - handle game over
+          return { timeRemaining: 0 }
+        }
+        return { timeRemaining: newTime }
+      }),
+      
+      useHint: (room) => set((state) => ({
+        hintsUsed: {
+          ...state.hintsUsed,
+          [room]: state.hintsUsed[room] + 1
+        }
+      })),
+      
+      saveAnswer: (room, answer) => set((state) => ({
+        answers: {
+          ...state.answers,
+          [room]: answer
+        }
+      })),
+      
+      resetGame: () => set({
+        teamName: '',
+        currentRoom: -1,
+        timeRemaining: 3600,
+        startTime: null,
+        completionTime: null,
+        gameStarted: false,
+        viewedIntro: false,
+        hintsUsed: {
+          room1: 0,
+          room2: 0,
+          room3: 0,
+          room4: 0,
+          room5: 0
+        },
+        answers: {
+          room1: '',
+          room2: '',
+          room3: '',
+          room4: '',
+          room5: ''
+        }
+      })
+    }),
+    {
+      name: 'santa-workshop-game',
+      partialize: (state) => ({
+        teamName: state.teamName,
+        currentRoom: state.currentRoom,
+        timeRemaining: state.timeRemaining,
+        startTime: state.startTime,
+        hintsUsed: state.hintsUsed,
+        answers: state.answers
+      })
+    }
+  )
+)
