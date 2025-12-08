@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage'
 import Introduction from './components/Introduction'
 import CompletionScreen from './components/CompletionScreen'
 import DevTools from './components/DevTools'
+import FacilitatorDashboard from './components/FacilitatorDashboard'
 
 // Import room components
 import Room1 from './components/rooms/Room1'
@@ -13,6 +14,13 @@ import Room4 from './components/rooms/Room4'
 import Room5 from './components/rooms/Room5'
 
 function App() {
+  // Check for facilitator route
+  const isFacilitator = window.location.pathname === '/facilitator' || window.location.hash === '#/facilitator'
+
+  if (isFacilitator) {
+    return <FacilitatorDashboard />
+  }
+
   const currentRoom = useGameStore(state => state.currentRoom)
   const startTime = useGameStore(state => state.startTime)
 

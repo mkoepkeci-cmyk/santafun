@@ -1,16 +1,29 @@
 import { useState } from 'react'
 import { useGameStore } from '../store/gameStore'
+import { registerTeam } from '../utils/supabase'
 
 export default function LandingPage() {
   const [name, setName] = useState('')
-  const { setTeamName, startGame } = useGameStore()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const { setTeamName, startGame, setLiveTeamId } = useGameStore()
 
-  const handleStart = (e) => {
+  const handleStart = async (e) => {
     e.preventDefault()
-    if (name.trim()) {
-      setTeamName(name.trim())
-      startGame()
+    if (!name.trim()) return
+
+    setLoading(true)
+    setError('')
+
+    // Register team in database
+    const team = await registerTeam(name.trim())
+    if (team) {
+      setLiveTeamId(team.id)
     }
+
+    setTeamName(name.trim())
+    startGame()
+    setLoading(false)
   }
 
   return (
@@ -44,53 +57,43 @@ export default function LandingPage() {
           {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-6xl md:text-7xl font-heading font-bold bg-gradient-to-r from-christmas-burgundy via-christmas-red to-christmas-lightRed bg-clip-text text-transparent mb-4 leading-tight">
-              Santa's Workshop
+              Join the Mission
             </h1>
             <h2 className="text-3xl md:text-4xl font-heading text-christmas-pine mb-6">
-              Crisis at the North Pole
+              Enter Your Team Name
             </h2>
-
-            <div className="inline-block bg-gradient-to-r from-christmas-red to-christmas-burgundy text-white px-8 py-4 rounded-2xl shadow-xl animate-pulse border-2 border-white/30">
-              <p className="text-2xl font-heading font-bold tracking-wide">🚨 URGENT MISSION 🚨</p>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="bg-gradient-to-br from-red-50 to-green-50/50 border-2 border-christmas-gold/30 rounded-2xl p-8 mb-8 shadow-inner">
-            <p className="text-xl text-gray-800 leading-relaxed text-center font-body">
-              The workshop has been <span className="font-bold text-christmas-red">locked down</span> by accident.
-              <br />
-              Santa's sleigh can't launch. Christmas hangs in the balance.
-              <br /><br />
-              <span className="text-2xl font-bold text-christmas-burgundy">
-                You have 60 minutes to save Christmas.
-              </span>
-            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleStart} className="space-y-6">
             <div>
               <label className="block text-left text-xl font-heading font-bold text-gray-800 mb-3">
-                Assemble Your Team:
+                Team Name:
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your team name..."
-                className="input-field text-center placeholder:text-gray-400"
+                className="input-field text-center placeholder:text-gray-400 text-2xl"
                 maxLength={50}
                 required
                 autoFocus
               />
             </div>
 
+            {error && (
+              <div className="bg-red-100 border-2 border-red-400 rounded-lg p-3">
+                <p className="text-red-700 text-center font-bold">{error}</p>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="btn-primary w-full text-2xl py-5"
+              disabled={loading || !name.trim()}
+              className="btn-primary w-full text-2xl py-5 disabled:opacity-50"
             >
-              🎄 Begin Mission 🎄
+              {loading ? '⏳ Joining...' : '🎄 Begin Mission 🎄'}
             </button>
           </form>
 

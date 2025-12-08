@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { updateTeamRoom, completeTeamGame } from '../utils/supabase'
 
 export const useGameStore = create(
   persist(
@@ -12,7 +13,10 @@ export const useGameStore = create(
       completionTime: null,
       gameStarted: false,
       viewedIntro: false,
-      
+
+      // Live team tracking
+      liveTeamId: null,
+
       // Hints tracking
       hintsUsed: {
         room1: 0,
@@ -21,7 +25,7 @@ export const useGameStore = create(
         room4: 0,
         room5: 0
       },
-      
+
       // Answers submitted
       answers: {
         room1: '',
@@ -33,26 +37,46 @@ export const useGameStore = create(
 
       // Actions
       setTeamName: (name) => set({ teamName: name }),
-      
+
+      // Set the live team ID after registration
+      setLiveTeamId: (id) => set({ liveTeamId: id }),
+
       proceedToTeamEntry: () => set({
         currentRoom: 0,
         viewedIntro: true
       }),
 
-      startGame: () => set({
-        gameStarted: true,
-        currentRoom: 1,
-        startTime: null  // Will be set when they click "Begin Mission"
-      }),
+      startGame: () => {
+        const state = get()
+        set({
+          gameStarted: true,
+          currentRoom: 1,
+          startTime: null  // Will be set when they click "Begin Mission"
+        })
 
-      nextRoom: () => set((state) => {
-        const updates = { currentRoom: state.currentRoom + 1 }
+        // Update live team room
+        if (state.liveTeamId) {
+          updateTeamRoom(state.liveTeamId, 1)
+        }
+      },
+
+      nextRoom: () => {
+        const state = get()
+        const newRoom = state.currentRoom + 1
+        const updates = { currentRoom: newRoom }
+
         // Start timer when moving from intro (room 1 with no startTime) to actual room 1
         if (state.currentRoom === 1 && !state.startTime) {
           updates.startTime = Date.now()
         }
-        return updates
-      }),
+
+        set(updates)
+
+        // Update live team room
+        if (state.liveTeamId) {
+          updateTeamRoom(state.liveTeamId, newRoom)
+        }
+      },
 
       // Development tool: Jump to any room
       goToRoom: (roomNumber) => set((state) => {
@@ -63,16 +87,22 @@ export const useGameStore = create(
         }
         return updates
       }),
-      
+
       completeGame: () => {
         const state = get()
         const timeTaken = Math.floor((Date.now() - state.startTime) / 1000)
-        set({ 
+
+        set({
           currentRoom: 6,
           completionTime: timeTaken
         })
+
+        // Update live team completion
+        if (state.liveTeamId) {
+          completeTeamGame(state.liveTeamId, timeTaken, state.hintsUsed)
+        }
       },
-      
+
       decrementTime: () => set((state) => {
         const newTime = state.timeRemaining - 1
         if (newTime <= 0) {
@@ -81,21 +111,21 @@ export const useGameStore = create(
         }
         return { timeRemaining: newTime }
       }),
-      
+
       useHint: (room) => set((state) => ({
         hintsUsed: {
           ...state.hintsUsed,
           [room]: state.hintsUsed[room] + 1
         }
       })),
-      
+
       saveAnswer: (room, answer) => set((state) => ({
         answers: {
           ...state.answers,
           [room]: answer
         }
       })),
-      
+
       resetGame: () => set({
         teamName: '',
         currentRoom: -1,
@@ -104,6 +134,7 @@ export const useGameStore = create(
         completionTime: null,
         gameStarted: false,
         viewedIntro: false,
+        liveTeamId: null,
         hintsUsed: {
           room1: 0,
           room2: 0,
@@ -128,7 +159,8 @@ export const useGameStore = create(
         timeRemaining: state.timeRemaining,
         startTime: state.startTime,
         hintsUsed: state.hintsUsed,
-        answers: state.answers
+        answers: state.answers,
+        liveTeamId: state.liveTeamId
       })
     }
   )

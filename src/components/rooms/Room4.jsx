@@ -6,34 +6,27 @@ import Confetti from 'react-confetti'
 
 export default function Room4() {
   const [answer, setAnswer] = useState('')
-  const [decodedSymbols, setDecodedSymbols] = useState([])
+  const [revealedLetters, setRevealedLetters] = useState({})
   const [error, setError] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
   const { nextRoom, saveAnswer } = useGameStore()
 
-  // Ancient recipe cipher - cookie shapes represent letters
-  const symbolKey = [
-    { id: 1, symbol: '⭐', shape: 'Star Cookie', letter: 'S', ingredient: 'Sugar' },
-    { id: 2, symbol: '🎄', shape: 'Tree Cookie', letter: 'P', ingredient: 'Peppermint' },
-    { id: 3, symbol: '🔔', shape: 'Bell Cookie', letter: 'I', ingredient: 'Icing' },
-    { id: 4, symbol: '❄️', shape: 'Snowflake Cookie', letter: 'C', ingredient: 'Cinnamon' },
-    { id: 5, symbol: '🎁', shape: 'Gift Cookie', letter: 'E', ingredient: 'Eggnog' },
+  // Mrs. Claus's Recipe Card - quantity indicates which letter position to extract
+  const recipeIngredients = [
+    { id: 1, ingredient: 'BUTTER', quantity: 3, unit: 'cups', letter: 'T', description: 'Salted, room temperature' },
+    { id: 2, ingredient: 'SUGAR', quantity: 5, unit: 'cups', letter: 'R', description: 'Pure cane sugar' },
+    { id: 3, ingredient: 'HONEY', quantity: 4, unit: 'tbsp', letter: 'E', description: 'North Pole wildflower' },
+    { id: 4, ingredient: 'CREAM', quantity: 4, unit: 'cups', letter: 'A', description: 'Fresh from the dairy' },
+    { id: 5, ingredient: 'NUTMEG', quantity: 3, unit: 'tsp', letter: 'T', description: 'Freshly grated' },
+    { id: 6, ingredient: 'EGGS', quantity: 4, unit: 'large', letter: 'S', description: 'Farm fresh' },
   ]
 
-  // The encoded recipe word: SPICE
-  const encodedRecipe = [
-    { position: 1, symbol: '⭐', letter: 'S' },
-    { position: 2, symbol: '🎄', letter: 'P' },
-    { position: 3, symbol: '🔔', letter: 'I' },
-    { position: 4, symbol: '❄️', letter: 'C' },
-    { position: 5, symbol: '🎁', letter: 'E' },
-  ]
-
-  const handleSymbolClick = (symbolItem) => {
-    if (decodedSymbols.find(s => s.id === symbolItem.id)) {
-      setDecodedSymbols(decodedSymbols.filter(s => s.id !== symbolItem.id))
-    } else {
-      setDecodedSymbols([...decodedSymbols, symbolItem])
+  const handleIngredientClick = (ingredient) => {
+    if (!showSuccess) {
+      setRevealedLetters(prev => ({
+        ...prev,
+        [ingredient.id]: !prev[ingredient.id]
+      }))
     }
   }
 
@@ -49,205 +42,212 @@ export default function Room4() {
         nextRoom()
       }, 3000)
     } else {
-      setError('❌ Incorrect ingredient! Read the Ancient Recipe more carefully...')
-      setTimeout(() => setError(''), 3000)
+      setError('Incorrect ingredient! The recipe holds the secret...')
+      setAnswer('')
     }
   }
 
+  const revealedCount = Object.values(revealedLetters).filter(Boolean).length
+
   return (
-    <div className="min-h-screen relative">
+    <div className="room-card">
       {showSuccess && <Confetti numberOfPieces={300} recycle={false} />}
 
-      {/* Background image */}
-      <div
-        className="absolute inset-0 opacity-20 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/images/cookie-kitchen.png)' }}
-      />
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h2 className="text-4xl font-bold text-christmas-red mb-2">
+          Mrs. Claus's Kitchen
+        </h2>
+        <p className="text-gray-600 text-lg">Room 4 of 5</p>
+      </div>
 
-      <div className="relative z-10 room-card">
-        <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold text-christmas-red mb-2">
-            🍪 THE COOKIE KITCHEN
-          </h2>
-          <p className="text-gray-600 text-lg">Room 4 of 5</p>
-        </div>
+      {/* Scene Description */}
+      <div className="bg-gradient-to-b from-amber-50 to-orange-50 border-2 border-amber-400 rounded-lg p-6 mb-6">
+        <p className="text-gray-700 leading-relaxed">
+          The aroma of cinnamon and vanilla fills the air as you enter Mrs. Claus's legendary kitchen.
+          Copper pots hang from the ceiling, and a warm fire crackles in the hearth. On the flour-dusted
+          counter lies an ancient recipe card — the Original Christmas Cookie Recipe, passed down through
+          generations of North Pole bakers.
+        </p>
+      </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-christmas-gold rounded-xl p-6 mb-6 shadow-inner">
-          <p className="text-lg leading-relaxed text-gray-800">
-            <span className="font-bold text-christmas-red text-xl">🧁 THE ANCIENT RECIPE SCROLL</span>
-            <br /><br />
-            You've entered Mrs. Claus's legendary Cookie Kitchen, where the air smells of cinnamon,
-            vanilla, and ancient magic. On the counter lies a weathered scroll—the Original Recipe,
-            written by the First Baker Elves in a cipher of cookie symbols.
-            <br /><br />
-            <span className="font-bold text-christmas-burgundy">
-              "Each cookie shape holds a letter. Decode the recipe to discover the secret ingredient
-              that makes Christmas cookies truly magical."
-            </span>
-          </p>
-        </div>
+      {/* Kitchen Image */}
+      <div className="mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-600">
+        <img
+          src="/images/cookies.jpg"
+          alt="Mrs. Claus's Kitchen"
+          className="w-full"
+        />
+      </div>
 
-        {/* Kitchen Image */}
-        <div className="mb-6 bg-gray-900 rounded-xl p-4 border-4 border-christmas-burgundy">
-          <img
-            src="/images/cookie-kitchen.png"
-            alt="Cookie Kitchen"
-            className="w-full rounded-lg shadow-2xl"
-          />
-          <p className="text-center text-christmas-gold mt-3 text-sm italic">
-            🔍 The elves are baking the symbols... What message do the cookies hold?
-          </p>
-        </div>
+      {/* Lore Card */}
+      <div className="bg-red-50 border-4 border-red-300 rounded-lg p-6 mb-8 shadow-inner">
+        <p className="text-center text-red-800 font-bold text-lg mb-4">
+          A Note from Mrs. Claus
+        </p>
+        <p className="text-gray-800 leading-relaxed italic">
+          "My dear helpers, this recipe has been in the Claus family since the very first Christmas.
+          The Ancient Elves encoded a secret within it — look not at what you add, but at the numbers
+          themselves. Each quantity points to a letter hiding within its ingredient.
+        </p>
+        <p className="text-gray-800 leading-relaxed font-bold mt-4 text-center">
+          Click each ingredient row to reveal its hidden letter!"
+        </p>
+      </div>
 
-        {/* Symbol Decoder Key */}
-        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 mb-6 border-2 border-amber-400">
-          <h3 className="text-2xl font-bold text-center mb-4 text-amber-900">
-            📜 The Cookie Cipher Decoder
+      {/* Recipe Card */}
+      <div className="bg-gradient-to-b from-amber-100 to-amber-50 rounded-xl p-6 mb-6 border-4 border-amber-600 shadow-2xl">
+        <div className="text-center mb-4">
+          <h3 className="text-3xl font-bold text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
+            ✨ The Original Christmas Cookie Recipe ✨
           </h3>
-          <p className="text-center text-gray-700 mb-4">
-            Click each cookie symbol to reveal its hidden letter:
-          </p>
+          <p className="text-amber-700 italic mt-1">Est. Year One — North Pole Archives</p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {symbolKey.map((item) => {
-              const isDecoded = decodedSymbols.find(s => s.id === item.id)
+        <div className="bg-white rounded-lg border-2 border-amber-400 overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600">
+              <tr>
+                <th className="p-3 text-left text-amber-950 font-bold">Qty</th>
+                <th className="p-3 text-left text-amber-950 font-bold">Ingredient</th>
+                <th className="p-3 text-left text-amber-950 font-bold">Notes</th>
+                <th className="p-3 text-center text-amber-950 font-bold">🔮</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recipeIngredients.map((item, index) => {
+                const isRevealed = revealedLetters[item.id]
+                // Highlight the letter at the quantity position
+                const letterIndex = item.quantity - 1
+                const ingredientLetters = item.ingredient.split('')
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleSymbolClick(item)}
-                  className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 ${
-                    isDecoded
-                      ? 'bg-amber-100 border-amber-600 shadow-lg'
-                      : 'bg-white border-gray-300 hover:border-amber-400'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="text-5xl">{item.symbol}</div>
-                      <div className="text-left">
-                        <p className="font-bold text-lg">{item.shape}</p>
-                        <p className="text-sm text-gray-600 italic">{item.ingredient}</p>
+                return (
+                  <tr
+                    key={item.id}
+                    onClick={() => handleIngredientClick(item)}
+                    className={`border-t-2 border-amber-200 cursor-pointer transition-all ${
+                      isRevealed
+                        ? 'bg-green-100 hover:bg-green-200'
+                        : 'hover:bg-amber-100'
+                    } ${showSuccess ? 'cursor-default' : ''}`}
+                  >
+                    <td className="p-4">
+                      <span className={`text-2xl font-bold ${isRevealed ? 'text-green-700' : 'text-amber-800'}`}>
+                        {item.quantity}
+                      </span>
+                      <span className="text-amber-600 ml-1 text-sm">{item.unit}</span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-1">
+                        {ingredientLetters.map((letter, idx) => (
+                          <span
+                            key={idx}
+                            className={`text-xl font-bold ${
+                              isRevealed && idx === letterIndex
+                                ? 'bg-green-600 text-white px-2 py-1 rounded animate-pulse'
+                                : 'text-amber-900'
+                            }`}
+                          >
+                            {letter}
+                          </span>
+                        ))}
                       </div>
-                    </div>
-                    {isDecoded && (
-                      <div className="ml-4">
-                        <div className="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-xl animate-pulse">
+                    </td>
+                    <td className="p-4 text-amber-700 italic text-sm">
+                      {item.description}
+                    </td>
+                    <td className="p-4 text-center">
+                      {isRevealed ? (
+                        <span className="inline-flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full text-xl font-bold shadow-lg">
                           {item.letter}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center justify-center w-10 h-10 bg-amber-300 text-amber-700 rounded-full text-xl">
+                          ?
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
 
-          {decodedSymbols.length === 5 && (
-            <div className="mt-6 bg-amber-50 border-2 border-amber-600 rounded-lg p-4">
-              <p className="text-center text-amber-900 font-bold text-lg">
-                ✨ All symbols decoded! Now read the Ancient Recipe below...
-              </p>
-            </div>
+        {/* Revealed Letters Display */}
+        <div className="mt-6 bg-amber-200 rounded-lg p-4 border-2 border-amber-500">
+          <p className="text-center text-amber-900 font-bold mb-3">
+            Hidden Letters Revealed: {revealedCount}/6
+          </p>
+          <div className="flex justify-center gap-3">
+            {recipeIngredients.map((item) => (
+              <div
+                key={item.id}
+                className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl font-bold shadow-lg ${
+                  revealedLetters[item.id]
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-amber-300 border-2 border-dashed border-amber-400'
+                }`}
+              >
+                {revealedLetters[item.id] ? item.letter : '?'}
+              </div>
+            ))}
+          </div>
+          {revealedCount === 6 && (
+            <p className="text-center text-green-700 font-bold mt-3 animate-pulse">
+              ✨ All letters revealed! What word do they spell? ✨
+            </p>
           )}
         </div>
-
-        {/* The Encoded Recipe */}
-        <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 mb-6 border-4 border-red-400">
-          <h3 className="text-2xl font-bold text-center mb-4 text-red-800">
-            📖 The Ancient Recipe Scroll
-          </h3>
-          <p className="text-center text-gray-700 mb-4 italic">
-            "The Secret Ingredient that Powers Christmas Magic..."
-          </p>
-
-          <div className="bg-amber-100 rounded-lg p-6 border-2 border-amber-600">
-            <div className="flex justify-center items-center gap-4 mb-4">
-              {encodedRecipe.map((item) => (
-                <div key={item.position} className="flex flex-col items-center">
-                  <div className="text-6xl mb-2">{item.symbol}</div>
-                  {decodedSymbols.length === 5 && (
-                    <div className="w-12 h-12 bg-red-600 rounded flex items-center justify-center text-white text-2xl font-bold animate-bounce">
-                      {item.letter}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {decodedSymbols.length === 5 && (
-              <div className="text-center mt-4">
-                <p className="text-2xl font-bold text-red-800">
-                  The symbols spell: {encodedRecipe.map(r => r.letter).join(' - ')}
-                </p>
-                <p className="text-gray-600 italic mt-2">
-                  "What magical ingredient do these letters name?"
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Recipe Book Lock */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 mb-6 shadow-2xl border-4 border-christmas-gold">
-          <h3 className="text-3xl font-bold text-center mb-6 text-christmas-gold">
-            🔐 The Recipe Book Lock
-          </h3>
-
-          {/* Decorative recipe book */}
-          <div className="flex justify-center mb-6">
-            <div className="relative w-48 h-56 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg border-8 border-amber-900 shadow-2xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-2">📖</div>
-                <p className="text-amber-100 font-bold text-sm">Original Recipe</p>
-                <p className="text-amber-300 text-xs italic">Est. Year 1</p>
-              </div>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <label className="block text-lg font-bold text-christmas-gold mb-2 text-center">
-              🔐 Enter the Secret Ingredient:
-            </label>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Name the ingredient..."
-                className="input-field flex-1 text-center text-2xl uppercase tracking-widest"
-                maxLength={20}
-                disabled={showSuccess}
-              />
-              <button
-                type="submit"
-                className="btn-primary px-12"
-                disabled={showSuccess || !answer.trim()}
-              >
-                {showSuccess ? '✅ Unlocked!' : '🔓 Submit'}
-              </button>
-            </div>
-
-            {error && (
-              <p className="text-red-400 font-bold mt-4 text-center bg-red-900/50 border border-red-500 rounded p-3 text-lg">{error}</p>
-            )}
-
-            {showSuccess && (
-              <p className="text-green-400 font-bold mt-4 text-center animate-pulse text-xl bg-green-900/50 border border-green-500 rounded p-3">
-                🎉 The Recipe Book opens! The final seal awaits in Santa's Office...
-              </p>
-            )}
-          </form>
-        </div>
-
-        <div className="bg-amber-50 border-2 border-amber-400 rounded-lg p-4 mb-6">
-          <p className="text-gray-700">
-            <span className="font-bold">💡 Hint:</span> Each cookie shape in the decoder represents a single letter. Use the key to decode the recipe scroll symbols and spell out the magical ingredient.
-          </p>
-        </div>
-
-        <HintSystem roomKey="room4" />
       </div>
+
+      {/* Decoder Hint */}
+      <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+        <p className="text-blue-800 text-center">
+          <span className="font-bold">🔍 The Cipher:</span> The quantity number tells you which letter
+          to extract from each ingredient name. For example, if an ingredient has quantity "3",
+          look at the 3rd letter of that ingredient's name.
+        </p>
+      </div>
+
+      {/* Answer Input */}
+      <form onSubmit={handleSubmit} className="mt-8">
+        <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg p-6 shadow-xl">
+          <label className="block text-xl font-bold text-christmas-gold mb-3 text-center">
+            What word do the hidden letters spell?
+          </label>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder="Enter the secret word..."
+              className="input-field flex-1 text-center text-2xl uppercase tracking-widest"
+              maxLength={10}
+              disabled={showSuccess}
+            />
+            <button
+              type="submit"
+              className="btn-primary px-8"
+              disabled={showSuccess || !answer.trim()}
+            >
+              {showSuccess ? 'Unlocked!' : 'Submit'}
+            </button>
+          </div>
+
+          {error && (
+            <p className="text-red-400 font-bold mt-3 text-center">{error}</p>
+          )}
+
+          {showSuccess && (
+            <p className="text-green-400 font-bold mt-3 text-center animate-pulse text-lg">
+              The oven chimes with approval! The fourth seal is broken...
+            </p>
+          )}
+        </div>
+      </form>
+
+      <HintSystem roomKey="room4" />
     </div>
   )
 }

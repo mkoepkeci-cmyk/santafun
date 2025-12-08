@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { saveTeamCompletion, getLeaderboard } from '../utils/supabase'
-import Confetti from 'react-confetti'
 
 export default function CompletionScreen() {
   const { teamName, completionTime, hintsUsed, resetGame } = useGameStore()
@@ -30,8 +29,6 @@ export default function CompletionScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Confetti numberOfPieces={500} recycle={true} />
-      
       <div className="room-card max-w-4xl text-center">
         <h1 className="text-6xl font-bold text-christmas-red mb-4 animate-pulse">
           🎄 CHRISTMAS SAVED! 🎄

@@ -1,19 +1,81 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { HINTS } from '../utils/answers'
+import {
+  requestHint,
+  getApprovedHints,
+  subscribeToTeamHints
+} from '../utils/supabase'
 
 export default function HintSystem({ roomKey }) {
   const [showHints, setShowHints] = useState(false)
-  const { hintsUsed, useHint } = useGameStore()
-  
+  const [pendingRequest, setPendingRequest] = useState(null)
+  const [approvedHints, setApprovedHints] = useState([])
+  const { hintsUsed, useHint, liveTeamId } = useGameStore()
+
   const currentHints = hintsUsed[roomKey]
   const availableHints = HINTS[roomKey]
 
+  // When connected to Supabase (has liveTeamId), use facilitated mode
+  const isFacilitated = !!liveTeamId
+
+  // Load approved hints for this room (facilitated mode)
+  useEffect(() => {
+    if (!liveTeamId) return
+
+    const loadApprovedHints = async () => {
+      const hints = await getApprovedHints(liveTeamId)
+      const roomHints = hints.filter(h => h.room_key === roomKey)
+      setApprovedHints(roomHints)
+
+      // Auto-reveal approved hints
+      roomHints.forEach(hint => {
+        if (hint.hint_number > currentHints) {
+          // Use the hint in the store
+          for (let i = currentHints; i < hint.hint_number; i++) {
+            useHint(roomKey)
+          }
+        }
+      })
+    }
+
+    loadApprovedHints()
+
+    // Subscribe to hint approvals
+    const subscription = subscribeToTeamHints(liveTeamId, (payload) => {
+      if (payload.new?.status === 'approved' && payload.new?.room_key === roomKey) {
+        loadApprovedHints()
+        setPendingRequest(null)
+      } else if (payload.new?.status === 'denied' && payload.new?.room_key === roomKey) {
+        setPendingRequest(null)
+      }
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [liveTeamId, roomKey])
+
+  // Standard mode - just reveal hint
   const handleUseHint = () => {
     if (currentHints < 3) {
       useHint(roomKey)
     }
   }
+
+  // Facilitated mode - request hint approval
+  const handleRequestHint = async () => {
+    if (!liveTeamId) return
+
+    const nextHintNumber = currentHints + 1
+    setPendingRequest(nextHintNumber)
+
+    await requestHint(liveTeamId, roomKey, nextHintNumber)
+  }
+
+  // Check if there's already a pending request for the next hint
+  const nextHintNumber = currentHints + 1
+  const hasPendingRequest = pendingRequest === nextHintNumber
 
   return (
     <div className="mt-6">
@@ -26,26 +88,62 @@ export default function HintSystem({ roomKey }) {
 
       {showHints && (
         <div className="mt-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
-          <h3 className="font-bold text-lg mb-2">Available Hints:</h3>
+          <h3 className="font-bold text-lg mb-2">
+            {isFacilitated ? 'Request Hints from Facilitator:' : 'Available Hints:'}
+          </h3>
+
           {availableHints.map((hint, index) => (
-            <div key={index} className="mb-2">
+            <div key={index} className="mb-3">
               {index < currentHints ? (
-                <p className="text-gray-700">
-                  <span className="font-bold">Hint {index + 1}:</span> {hint}
-                </p>
+                // Already revealed hint
+                <div className="bg-green-100 border border-green-400 rounded p-3">
+                  <p className="text-gray-700">
+                    <span className="font-bold text-green-700">Hint {index + 1}:</span> {hint}
+                  </p>
+                </div>
               ) : index === currentHints ? (
-                <button
-                  onClick={handleUseHint}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-                  disabled={currentHints >= 3}
-                >
-                  Reveal Hint {index + 1}
-                </button>
+                // Next hint to reveal/request
+                isFacilitated ? (
+                  // Facilitated mode - request hint
+                  hasPendingRequest ? (
+                    <div className="bg-yellow-200 border border-yellow-500 rounded p-3 animate-pulse">
+                      <p className="text-yellow-800 font-bold">
+                        ⏳ Hint {index + 1} - Waiting for facilitator approval...
+                      </p>
+                      <p className="text-yellow-700 text-sm mt-1">
+                        Ask your facilitator to approve your hint request!
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleRequestHint}
+                      className="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded font-bold transition-all"
+                    >
+                      🙋 Request Hint {index + 1} from Facilitator
+                    </button>
+                  )
+                ) : (
+                  // Standard mode - instant reveal
+                  <button
+                    onClick={handleUseHint}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                    disabled={currentHints >= 3}
+                  >
+                    Reveal Hint {index + 1}
+                  </button>
+                )
               ) : (
+                // Locked hint
                 <p className="text-gray-400">🔒 Hint {index + 1} (locked)</p>
               )}
             </div>
           ))}
+
+          {isFacilitated && (
+            <p className="text-sm text-gray-500 mt-4 italic">
+              Hints must be approved by your game facilitator.
+            </p>
+          )}
         </div>
       )}
     </div>

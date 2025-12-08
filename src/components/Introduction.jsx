@@ -1,10 +1,39 @@
 import { useEffect, useState } from 'react'
 import { useGameStore } from '../store/gameStore'
+import { getGameState, subscribeToGameState } from '../utils/supabase'
 
 export default function Introduction() {
   const [canSkip, setCanSkip] = useState(false)
   const [currentParagraph, setCurrentParagraph] = useState(0)
+  const [gameUnlocked, setGameUnlocked] = useState(false)
   const proceedToTeamEntry = useGameStore(state => state.proceedToTeamEntry)
+
+  // Check if game is unlocked (facilitator started it)
+  useEffect(() => {
+    const checkGameState = async () => {
+      const state = await getGameState()
+      setGameUnlocked(state.is_active)
+    }
+
+    checkGameState()
+
+    // Subscribe to game state changes
+    const subscription = subscribeToGameState((payload) => {
+      if (payload.new?.is_active) {
+        setGameUnlocked(true)
+      } else {
+        setGameUnlocked(false)
+      }
+    })
+
+    // Poll every 3 seconds as backup
+    const pollInterval = setInterval(checkGameState, 3000)
+
+    return () => {
+      subscription?.unsubscribe()
+      clearInterval(pollInterval)
+    }
+  }, [])
 
   useEffect(() => {
     // Allow skipping after 5 seconds
@@ -172,12 +201,26 @@ export default function Introduction() {
         </div>
 
         {canSkip && currentParagraph >= 5 && (
-          <button
-            onClick={proceedToTeamEntry}
-            className="btn-primary mt-6 w-full text-2xl py-4 shadow-2xl transform hover:scale-105 transition-all"
-          >
-            🎄 I'm Ready - Let's Save Christmas! 🎄
-          </button>
+          gameUnlocked ? (
+            <button
+              onClick={proceedToTeamEntry}
+              className="btn-primary mt-6 w-full text-2xl py-4 shadow-2xl transform hover:scale-105 transition-all"
+            >
+              🎄 I'm Ready - Let's Save Christmas! 🎄
+            </button>
+          ) : (
+            <div className="mt-6">
+              <button
+                disabled
+                className="w-full text-2xl py-4 bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed opacity-60"
+              >
+                ⏳ Waiting for Facilitator to Start Game...
+              </button>
+              <p className="text-center mt-3 text-gray-600 animate-pulse">
+                Your facilitator will unlock the game shortly. Stand by!
+              </p>
+            </div>
+          )
         )}
 
         {!canSkip && (
@@ -185,6 +228,18 @@ export default function Introduction() {
             📡 Urgent transmission incoming...
           </p>
         )}
+
+        {/* Facilitator link */}
+        <div className="mt-6 text-center">
+          <a
+            href="/facilitator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 hover:text-christmas-burgundy underline transition-colors"
+          >
+            Game Facilitator? Access Dashboard →
+          </a>
+        </div>
       </div>
     </div>
   )

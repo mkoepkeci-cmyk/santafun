@@ -1,18 +1,18 @@
 // Puzzle answers (normalized to lowercase for comparison)
 export const ANSWERS = {
-  room1: 'twelve',
+  room1: 'candy',
   room2: 'bells',
-  room3: 'north',
-  room4: 'spice',
-  room5: 'belief'
+  room3: 'rudolph',
+  room4: 'treats',
+  room5: 'magic'
 }
 
 // Hint text for each room
 export const HINTS = {
   room1: [
-    "Look at the clock on the fireplace mantle...",
-    "What time does the clock show? Count the numbers...",
-    "The clock shows 12 o'clock. The answer is the word for that number: TWELVE"
+    "The Ancient Elves honored these children by preserving more than just their words. Every detail was recorded for a reason.",
+    "Home is where the heart is — and perhaps where the answer hides. Look beyond the letters themselves.",
+    "The brass nameplates hold the key. Take the first letter of each child's hometown, ordered from oldest to newest: Caramel Creek, Anchorage, Nashville, Denver, Yakima."
   ],
   room2: [
     "Stage 1: Identify which Christmas carol each conveyor belt represents from the toys shown",
@@ -20,19 +20,19 @@ export const HINTS = {
     "Stage 3: The revealed letters (L, S, E, B, L) can be rearranged to spell: BELLS"
   ],
   room3: [
-    "Look at the colored lights on the reindeer antlers...",
-    "Each color might represent a letter or direction...",
-    "The reindeer lights point to a navigation direction: NORTH"
+    "The Ancient Elves knew the original eight by heart. But the formation has evolved since 1939...",
+    "Count the stalls. Count the positions on the board. Something doesn't add up.",
+    "Who guides the sleigh when the night is dark and stormy? Who was added to lead them all? RUDOLPH"
   ],
   room4: [
-    "Each cookie shape represents a letter in an ancient recipe...",
-    "Look for patterns in the cookie decorations and match them to jar labels...",
-    "The secret ingredient that makes Christmas special: SPICE"
+    "Mrs. Claus's recipe holds the key. The quantity numbers aren't just for measuring...",
+    "Each quantity tells you which letter position to look at in that ingredient's name. 3 cups of BUTTER? Look at the 3rd letter: T.",
+    "Extract each letter: BU(T)TER, SUGA(R), HON(E)Y, CRE(A)M, NU(T)MEG, EGG(S) = TREATS"
   ],
   room5: [
-    "This is the heart of the ancient magic. What makes Christmas real?",
-    "Look at everything in Santa's office - books, symbols, the essence of the season...",
-    "The ultimate power that unlocks everything: BELIEF"
+    "The Ancient Elves loved wordplay. Look carefully at how each room's lesson is described — the answer is woven into the words themselves.",
+    "Each lesson has one word highlighted. What do those words have in common? Look at how they begin.",
+    "Take the first letter of each lesson: Memories, Artistry, Guide, Ingredients, Claus = M-A-G-I-C"
   ]
 }
 

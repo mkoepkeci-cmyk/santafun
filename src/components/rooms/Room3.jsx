@@ -1,227 +1,381 @@
 import { useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
-import { validateAnswer } from '../../utils/answers'
 import HintSystem from '../HintSystem'
 import Confetti from 'react-confetti'
 
 export default function Room3() {
-  const [answer, setAnswer] = useState('')
-  const [selectedLights, setSelectedLights] = useState([])
-  const [error, setError] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
+  const [assignments, setAssignments] = useState({})
+  const [draggedNameplate, setDraggedNameplate] = useState(null)
+  const [verificationResults, setVerificationResults] = useState({}) // tracks correct/incorrect per stall
+  const [hasChecked, setHasChecked] = useState(false)
   const { nextRoom, saveAnswer } = useGameStore()
 
-  // Light color code mapping to letters/directions
-  const lightCode = [
-    { id: 1, color: 'red', position: 'left antler', letter: 'N', direction: 'North' },
-    { id: 2, color: 'gold', position: 'right antler', letter: 'O', direction: 'Orient' },
-    { id: 3, color: 'green', position: 'center', letter: 'R', direction: 'Return' },
-    { id: 4, color: 'blue', position: 'left back', letter: 'T', direction: 'True' },
-    { id: 5, color: 'red', position: 'right back', letter: 'H', direction: 'Home' },
+  // Only the 8 reindeer - RUDOLPH is pre-filled as leader
+  const nameplates = [
+    'DASHER', 'DANCER', 'PRANCER', 'VIXEN',
+    'COMET', 'CUPID', 'DONNER', 'BLITZEN'
   ]
 
-  const handleLightClick = (light) => {
-    if (selectedLights.find(l => l.id === light.id)) {
-      setSelectedLights(selectedLights.filter(l => l.id !== light.id))
-    } else {
-      setSelectedLights([...selectedLights, light])
+  const stalls = [
+    { id: 1, clue: "The swiftest of all — always first off the ground, a blur of brown fur.", answer: 'DASHER' },
+    { id: 2, clue: "Grace in motion, this one moves like music made visible.", answer: 'DANCER' },
+    { id: 3, clue: "Head held high, hooves precise — vanity perhaps, but earned.", answer: 'PRANCER' },
+    { id: 4, clue: "The clever one. Watches everything. Knows more than she lets on.", answer: 'VIXEN' },
+    { id: 5, clue: "Blazes through the sky like a streak of light from the heavens.", answer: 'COMET' },
+    { id: 6, clue: "The heart of the team — believes in love above all else.", answer: 'CUPID' },
+    { id: 7, clue: "Thunder follows where this one flies. Steady. Powerful. Certain.", answer: 'DONNER' },
+    { id: 8, clue: "Lightning in reindeer form — electric energy, impossible to tire.", answer: 'BLITZEN' }
+  ]
+
+  const handleDragStart = (nameplate) => {
+    if (!showSuccess) {
+      setDraggedNameplate(nameplate)
     }
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleDrop = (stallId) => {
+    if (draggedNameplate && !showSuccess) {
+      const newAssignments = { ...assignments }
+      // Remove from previous stall if assigned elsewhere
+      Object.keys(newAssignments).forEach(key => {
+        if (newAssignments[key] === draggedNameplate) {
+          delete newAssignments[key]
+        }
+      })
+      // Assign to new stall
+      newAssignments[stallId] = draggedNameplate
+      setAssignments(newAssignments)
+      setDraggedNameplate(null)
+      // Clear verification when assignments change
+      setVerificationResults({})
+      setHasChecked(false)
+    }
+  }
 
-    if (validateAnswer('room3', answer)) {
-      saveAnswer('room3', answer)
+  const handleRemove = (stallId) => {
+    if (!showSuccess) {
+      const newAssignments = { ...assignments }
+      delete newAssignments[stallId]
+      setAssignments(newAssignments)
+      // Clear verification when assignments change
+      setVerificationResults({})
+      setHasChecked(false)
+    }
+  }
+
+  const handleVerifyFormation = () => {
+    // Check each stall and mark correct/incorrect
+    const results = {}
+    let allCorrect = true
+
+    for (const stall of stalls) {
+      if (assignments[stall.id] === stall.answer) {
+        results[stall.id] = 'correct'
+      } else if (assignments[stall.id]) {
+        results[stall.id] = 'incorrect'
+        allCorrect = false
+      } else {
+        results[stall.id] = 'empty'
+        allCorrect = false
+      }
+    }
+
+    setVerificationResults(results)
+    setHasChecked(true)
+
+    if (allCorrect) {
+      // Success! All 8 correct
+      saveAnswer('room3', 'rudolph')
       setShowSuccess(true)
-      setError('')
 
       setTimeout(() => {
         nextRoom()
       }, 3000)
-    } else {
-      setError('❌ Incorrect direction! Study the Ancient Star Compass...')
-      setTimeout(() => setError(''), 3000)
     }
   }
 
+  const assignedNameplates = Object.values(assignments)
+  const availableNameplates = nameplates.filter(n => !assignedNameplates.includes(n))
+
+  const correctCount = Object.values(verificationResults).filter(r => r === 'correct').length
+  const incorrectCount = Object.values(verificationResults).filter(r => r === 'incorrect').length
+
   return (
-    <div className="min-h-screen relative">
+    <div className="room-card">
       {showSuccess && <Confetti numberOfPieces={300} recycle={false} />}
 
-      {/* Background image */}
-      <div
-        className="absolute inset-0 opacity-20 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/images/reindeer-stable.png)' }}
-      />
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h2 className="text-4xl font-bold text-christmas-red mb-2">
+          The Reindeer Stable
+        </h2>
+        <p className="text-gray-600 text-lg">Room 3 of 5</p>
+      </div>
 
-      <div className="relative z-10 room-card">
-        <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold text-christmas-red mb-2">
-            🦌 THE REINDEER STABLE
-          </h2>
-          <p className="text-gray-600 text-lg">Room 3 of 5</p>
-        </div>
+      {/* Scene Description */}
+      <div className="bg-gradient-to-b from-amber-50 to-orange-50 border-2 border-amber-400 rounded-lg p-6 mb-6">
+        <p className="text-gray-700 leading-relaxed">
+          You enter a warm, hay-scented stable lit by hanging lanterns. Eight reindeer peer
+          curiously from their stalls, Christmas lights twinkling on their antlers. The stall
+          nameplates have been scrambled — only Rudolph's position at the front remains secure.
+        </p>
+      </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-christmas-gold rounded-xl p-6 mb-6 shadow-inner">
-          <p className="text-lg leading-relaxed text-gray-800">
-            <span className="font-bold text-christmas-red text-xl">⭐ THE ANCIENT STAR COMPASS</span>
-            <br /><br />
-            You've entered the Reindeer Stable, where Dasher, Dancer, Prancer, Vixen, Comet, and Cupid
-            rest between their sacred flights. Each reindeer wears enchanted lights upon their antlers—
-            a gift from the Ancient Elves to guide them through the darkest winter nights.
-            <br /><br />
-            <span className="font-bold text-christmas-burgundy">
-              "When the colored lights are read in sequence, they reveal the sacred direction that leads all travelers home.
-              Speak the direction to unlock the passage."
-            </span>
-          </p>
-        </div>
+      {/* Stable Image */}
+      <div className="mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-600">
+        <img
+          src="/images/reindeer.jpg"
+          alt="The Reindeer Stable"
+          className="w-full"
+        />
+      </div>
 
-        {/* Stable Image */}
-        <div className="mb-6 bg-gray-900 rounded-xl p-4 border-4 border-christmas-burgundy">
-          <img
-            src="/images/reindeer-stable.png"
-            alt="Reindeer Stable"
-            className="w-full rounded-lg shadow-2xl"
-          />
-          <p className="text-center text-christmas-gold mt-3 text-sm italic">
-            🔍 Study the lights on the reindeer antlers... Each color holds meaning...
-          </p>
-        </div>
+      {/* Lore Card */}
+      <div className="bg-red-50 border-4 border-red-300 rounded-lg p-6 mb-8 shadow-inner">
+        <p className="text-center text-red-800 font-bold text-lg mb-4">
+          Notice from Jingleheimer Schmidt
+        </p>
+        <p className="text-gray-800 leading-relaxed italic">
+          "The lockdown has scrambled the Reindeer Registry! Match each reindeer to their
+          correct stall using the clues. The Ancient Elves designed the formation based on
+          each reindeer's unique gift.
+        </p>
+        <p className="text-gray-800 leading-relaxed font-bold mt-4 text-center">
+          Place all 8 reindeer correctly to restore the formation!"
+        </p>
+      </div>
 
-        {/* Light Code Discovery Section */}
-        <div className="bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-xl p-6 mb-6 border-2 border-indigo-300">
-          <h3 className="text-2xl font-bold text-center mb-4 text-indigo-800">
-            🌟 The Ancient Light Cipher
-          </h3>
-          <p className="text-center text-gray-700 mb-4">
-            The Ancient Elves encoded navigation secrets in colored light. Click each light to reveal its meaning:
-          </p>
+      {/* Flight Formation Board */}
+      <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl p-6 mb-6 border-4 border-amber-500">
+        <h3 className="text-2xl font-bold text-christmas-gold mb-4 text-center">
+          Flight Formation Board
+        </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {lightCode.map((light) => {
-              const isSelected = selectedLights.find(l => l.id === light.id)
-              const bgColor =
-                light.color === 'red' ? 'bg-red-100 border-red-500' :
-                light.color === 'gold' ? 'bg-yellow-100 border-yellow-500' :
-                light.color === 'green' ? 'bg-green-100 border-green-500' :
-                'bg-blue-100 border-blue-500'
-
-              const lightColor =
-                light.color === 'red' ? 'bg-red-500' :
-                light.color === 'gold' ? 'bg-yellow-400' :
-                light.color === 'green' ? 'bg-green-500' :
-                'bg-blue-500'
-
-              return (
-                <button
-                  key={light.id}
-                  onClick={() => handleLightClick(light)}
-                  className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 ${
-                    isSelected
-                      ? `${bgColor} shadow-lg`
-                      : 'bg-white border-gray-300 hover:border-indigo-400'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 ${lightColor} rounded-full shadow-lg animate-pulse`}></div>
-                      <div className="text-left">
-                        <p className="font-bold text-lg capitalize">{light.color} Light</p>
-                        <p className="text-sm text-gray-600 italic">{light.position}</p>
-                      </div>
-                    </div>
-                    {isSelected && (
-                      <div className="ml-4">
-                        <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-xl">
-                          {light.letter}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </button>
-              )
-            })}
+        <div className="flex flex-col items-center text-white">
+          {/* Lead Position - RUDOLPH pre-filled */}
+          <div className="mb-4">
+            <div className="w-28 h-14 border-2 border-red-500 bg-gradient-to-r from-red-700 to-red-600 rounded-lg flex items-center justify-center shadow-lg">
+              <span className="font-bold text-white text-lg">RUDOLPH</span>
+            </div>
+            <p className="text-center text-red-400 text-sm mt-1">Lead Position</p>
           </div>
 
-          {selectedLights.length === 5 && (
-            <div className="mt-6 bg-indigo-50 border-2 border-indigo-500 rounded-lg p-4">
-              <p className="text-center text-indigo-700 font-bold text-lg">
-                ✨ All lights decoded! The letters spell: {lightCode.map(l => l.letter).join(' - ')}
-              </p>
-              <p className="text-center text-gray-600 mt-2 italic">
-                "The direction that guides all wanderers home..."
-              </p>
+          <div className="text-2xl text-gray-500 mb-2">⬇</div>
+
+          {/* Row 1-2 */}
+          <div className="flex gap-8 mb-2">
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[1] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[1] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[1] || '[1]'}
             </div>
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[2] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[2] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[2] || '[2]'}
+            </div>
+          </div>
+
+          {/* Row 3-4 */}
+          <div className="flex gap-8 mb-2">
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[3] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[3] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[3] || '[3]'}
+            </div>
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[4] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[4] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[4] || '[4]'}
+            </div>
+          </div>
+
+          {/* Row 5-6 */}
+          <div className="flex gap-8 mb-2">
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[5] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[5] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[5] || '[5]'}
+            </div>
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[6] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[6] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[6] || '[6]'}
+            </div>
+          </div>
+
+          {/* Row 7-8 */}
+          <div className="flex gap-8 mb-4">
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[7] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[7] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[7] || '[7]'}
+            </div>
+            <div className={`w-20 h-10 border rounded flex items-center justify-center text-xs ${
+              verificationResults[8] === 'correct' ? 'border-green-500 bg-green-900/50' :
+              verificationResults[8] === 'incorrect' ? 'border-red-500 bg-red-900/50' :
+              'border-amber-500'
+            }`}>
+              {assignments[8] || '[8]'}
+            </div>
+          </div>
+
+          {/* Sleigh */}
+          <div className="text-3xl">🛷</div>
+        </div>
+      </div>
+
+      {/* Scattered Nameplates */}
+      <div className={`bg-gradient-to-b from-amber-100 to-amber-50 rounded-xl p-6 mb-6 border-2 ${showSuccess ? 'border-green-500' : 'border-amber-500'}`}>
+        <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">
+          Scattered Nameplates
+        </h3>
+        <div className="flex flex-wrap justify-center gap-3">
+          {availableNameplates.map((nameplate) => (
+            <div
+              key={nameplate}
+              draggable={!showSuccess}
+              onDragStart={() => handleDragStart(nameplate)}
+              className={`px-4 py-2 rounded-lg shadow-lg transition-transform ${
+                showSuccess
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 cursor-grab active:cursor-grabbing hover:scale-105'
+              }`}
+            >
+              <span className="font-bold text-amber-950">{nameplate}</span>
+            </div>
+          ))}
+          {availableNameplates.length === 0 && !showSuccess && (
+            <p className="text-amber-700 italic">All nameplates assigned! Click "Verify Formation" below.</p>
+          )}
+          {showSuccess && (
+            <p className="text-green-700 font-bold">Formation complete!</p>
           )}
         </div>
+      </div>
 
-        {/* Navigation Compass Interface */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 mb-6 shadow-2xl border-4 border-christmas-gold">
-          <h3 className="text-3xl font-bold text-center mb-6 text-christmas-gold">
-            🧭 The Star Compass Lock
-          </h3>
+      {/* The Eight Stalls */}
+      <div className="mb-6">
+        <h3 className="text-2xl font-bold text-christmas-green mb-4 text-center">
+          The Eight Stalls
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {stalls.map((stall) => {
+            const result = verificationResults[stall.id]
+            const isCorrect = result === 'correct'
+            const isIncorrect = result === 'incorrect'
 
-          {/* Compass visualization */}
-          <div className="flex justify-center mb-6">
-            <div className="relative w-64 h-64 bg-gradient-to-br from-amber-100 to-yellow-50 rounded-full border-8 border-christmas-burgundy shadow-2xl">
-              {/* Compass points */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 text-2xl font-bold text-red-600">N</div>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xl font-bold text-gray-600">S</div>
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-600">W</div>
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-600">E</div>
-
-              {/* Center star */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl text-christmas-gold animate-pulse">
-                ⭐
-              </div>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <label className="block text-lg font-bold text-christmas-gold mb-2 text-center">
-              🔐 Enter the Sacred Direction:
-            </label>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Speak the direction..."
-                className="input-field flex-1 text-center text-2xl uppercase tracking-widest"
-                maxLength={20}
-                disabled={showSuccess}
-              />
-              <button
-                type="submit"
-                className="btn-primary px-12"
-                disabled={showSuccess || !answer.trim()}
+            return (
+              <div
+                key={stall.id}
+                onDragOver={(e) => !showSuccess && e.preventDefault()}
+                onDrop={() => handleDrop(stall.id)}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  isCorrect
+                    ? 'bg-green-100 border-green-600'
+                    : isIncorrect
+                      ? 'bg-red-100 border-red-500'
+                      : assignments[stall.id]
+                        ? 'bg-green-50 border-green-500'
+                        : 'bg-white border-gray-300 border-dashed'
+                }`}
               >
-                {showSuccess ? '✅ Unlocked!' : '🔓 Submit'}
-              </button>
-            </div>
-
-            {error && (
-              <p className="text-red-400 font-bold mt-4 text-center bg-red-900/50 border border-red-500 rounded p-3 text-lg">{error}</p>
-            )}
-
-            {showSuccess && (
-              <p className="text-green-400 font-bold mt-4 text-center animate-pulse text-xl bg-green-900/50 border border-green-500 rounded p-3">
-                🎉 The compass spins true! The Cookie Kitchen door unlocks...
-              </p>
-            )}
-          </form>
+                <div className="flex items-start gap-3">
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                    isCorrect ? 'bg-green-600' :
+                    isIncorrect ? 'bg-red-500' :
+                    'bg-amber-600'
+                  }`}>
+                    {isCorrect ? '✓' : isIncorrect ? '✗' : stall.id}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-700 text-sm italic mb-2">"{stall.clue}"</p>
+                    {assignments[stall.id] ? (
+                      <div className="flex items-center justify-between">
+                        <div className={`px-3 py-1 rounded ${
+                          isCorrect
+                            ? 'bg-green-600'
+                            : isIncorrect
+                              ? 'bg-red-500'
+                              : 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600'
+                        }`}>
+                          <span className={`font-bold ${isCorrect || isIncorrect ? 'text-white' : 'text-amber-950'}`}>
+                            {assignments[stall.id]}
+                          </span>
+                        </div>
+                        {!showSuccess && !isCorrect && (
+                          <button
+                            onClick={() => handleRemove(stall.id)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 text-sm">Drag nameplate here...</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
+      </div>
 
-        <div className="bg-amber-50 border-2 border-amber-400 rounded-lg p-4 mb-6">
-          <p className="text-gray-700">
-            <span className="font-bold">💡 Hint:</span> The reindeer lights spell out letters. Read them in order to discover the navigation direction that points the way home on Christmas Eve.
+      {/* Verification Results */}
+      {hasChecked && !showSuccess && (
+        <div className="mb-6 bg-amber-100 border-2 border-amber-500 rounded-lg p-4">
+          <p className="text-amber-900 font-bold text-center text-lg">
+            {correctCount} correct, {incorrectCount} incorrect
+          </p>
+          <p className="text-amber-800 text-center mt-2">
+            Fix the red X placements and try again!
           </p>
         </div>
+      )}
 
-        <HintSystem roomKey="room3" />
-      </div>
+      {/* Verify Formation Button */}
+      {!showSuccess && (
+        <div className="mb-6">
+          <button
+            onClick={handleVerifyFormation}
+            className="w-full bg-christmas-green hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-all text-xl"
+            disabled={Object.keys(assignments).length !== 8}
+          >
+            Verify Formation ({Object.keys(assignments).length}/8 assigned)
+          </button>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="mb-6 bg-green-100 border-4 border-green-500 rounded-lg p-6">
+          <p className="text-green-800 font-bold text-center text-xl">
+            Formation Complete!
+          </p>
+          <p className="text-green-700 text-center mt-2">
+            The reindeer stomp their hooves in approval. The third seal is broken...
+          </p>
+        </div>
+      )}
+
+      <HintSystem roomKey="room3" />
     </div>
   )
 }

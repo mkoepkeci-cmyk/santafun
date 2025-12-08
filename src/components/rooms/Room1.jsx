@@ -8,7 +8,81 @@ export default function Room1() {
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
+  const [expandedLetter, setExpandedLetter] = useState(null)
   const { nextRoom, saveAnswer } = useGameStore()
+
+  const legendaryLetters = [
+    {
+      id: 1,
+      name: "Clara",
+      age: 7,
+      hometown: "Caramel Creek",
+      state: "Colorado",
+      year: 1847,
+      content: `Dear Father Christmas,
+
+I do not want toys this year. I only want my grandmother to feel better. She has been coughing since the first snow and cannot get warm. She always smells like cinnamon and calls me her "little sugarplum." If you could bring her woolen socks and perhaps some of your magic, I would be so grateful.
+
+Your faithful believer,
+Clara`
+    },
+    {
+      id: 2,
+      name: "Amir",
+      age: 9,
+      hometown: "Anchorage",
+      state: "Alaska",
+      year: 1923,
+      content: `Dear Santa Claus,
+
+My father works on a fishing vessel and has been gone for many weeks. I do not need presents — I only want him to come home safe before the ice sets in. Could you ask the winds to be gentle? I have left extra cookies because I think the elves probably eat yours before you see them.
+
+Hopefully,
+Amir`
+    },
+    {
+      id: 3,
+      name: "Nina",
+      age: 6,
+      hometown: "Nashville",
+      state: "Tennessee",
+      year: 1962,
+      content: `Dear Santa,
+
+My baby brother cries all night and Mama is so tired she falls asleep at supper. I want to help but I am too small. Could you bring something to make him happy? I have been good all year even when I wanted to pinch him.
+
+Love,
+Nina`
+    },
+    {
+      id: 4,
+      name: "Diego",
+      age: 8,
+      hometown: "Denver",
+      state: "Colorado",
+      year: 1989,
+      content: `Dear Santa,
+
+I know you are very busy. I do not need a new bike or Nintendo. I only want my dog Biscuit to stop being scared of thunderstorms. She hides under my bed and shivers so hard. Can you fix that? I will share my Christmas cookies with her if you do.
+
+Thank you,
+Diego`
+    },
+    {
+      id: 5,
+      name: "Yuki",
+      age: 10,
+      hometown: "Yakima",
+      state: "Washington",
+      year: 2003,
+      content: `Dear Mr. Claus,
+
+I am writing because my mother says you answer letters from children who try their best. I try very hard. I would like my family to eat dinner together again, like we used to before. That is all I want.
+
+Respectfully yours,
+Yuki`
+    }
+  ]
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -22,154 +96,160 @@ export default function Room1() {
         nextRoom()
       }, 3000)
     } else {
-      setError('❌ Incorrect code! Study the ancient timekeeper...')
-      setTimeout(() => setError(''), 3000)
+      setError('Incorrect code. Look deeper into the Archive...')
+      setAnswer('')
     }
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="room-card">
       {showSuccess && <Confetti numberOfPieces={200} recycle={false} />}
 
-      {/* Background image */}
-      <div
-        className="absolute inset-0 opacity-25 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/images/mail-room.png)' }}
-      />
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h2 className="text-4xl font-bold text-christmas-red mb-2">
+          The Mail Room
+        </h2>
+        <p className="text-gray-600 text-lg">Room 1 of 5</p>
+      </div>
 
-      <div className="relative z-10 room-card">
-        <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold text-christmas-red mb-2">
-            🎅 SANTA'S OFFICE - The Control Room
-          </h2>
-          <p className="text-gray-600 text-lg">Room 1 of 5</p>
-        </div>
+      {/* Scene Description */}
+      <div className="bg-gradient-to-b from-amber-50 to-orange-50 border-2 border-amber-400 rounded-lg p-6 mb-6">
+        <p className="text-gray-700 leading-relaxed mb-4">
+          You enter the North Pole Mail Room — a cavernous space filled with pneumatic tubes,
+          sorting machines, and mountains of envelopes. But dominating the far wall is something
+          different: a glass display case illuminated by soft golden light, containing five
+          weathered letters on velvet pedestals.
+        </p>
+        <p className="text-gray-700 leading-relaxed">
+          Above the case, carved in ancient elvish script (with a helpful translation beneath), reads:
+        </p>
+      </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-christmas-gold rounded-xl p-6 mb-6 shadow-inner">
-          <p className="text-lg leading-relaxed text-gray-800">
-            <span className="font-bold text-christmas-red text-xl">⏰ THE ANCIENT TIMEKEEPER'S CIPHER</span>
-            <br /><br />
-            You've entered Santa's Command Center. The room is filled with ancient technology
-            - control panels, communication devices, and mysterious instruments forged by the Ancient Elves.
-            <br /><br />
-            Above the grand fireplace hangs <span className="font-bold">the Timekeeper's Clock</span>,
-            an artifact of immense power. The elves say it doesn't just tell time—it <span className="italic">guards</span> it.
-            <br /><br />
-            <span className="font-bold text-christmas-burgundy">
-              "When the clock strikes the hour of completion, speak its name to unlock the first seal."
-            </span>
-          </p>
-        </div>
+      {/* Mail Room Image */}
+      <div className="mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-600">
+        <img
+          src="/images/new mailroom.png"
+          alt="The Archive of Selfless Wishes"
+          className="w-full"
+        />
+      </div>
 
-        {/* Visual Clock Representation */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 mb-6 shadow-2xl border-4 border-christmas-gold">
-          <div className="text-center">
-            <div className="inline-block bg-gradient-to-br from-amber-100 to-yellow-50 rounded-full p-8 shadow-2xl border-8 border-christmas-burgundy relative" style={{width: '280px', height: '280px'}}>
-              {/* Clock face */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-full h-full">
-                  {/* Hour numbers */}
-                  {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((hour, index) => {
-                    const angle = (index * 30) - 90;
-                    const radian = (angle * Math.PI) / 180;
-                    const radius = 100;
-                    const x = radius * Math.cos(radian);
-                    const y = radius * Math.sin(radian);
+      {/* Archive Title */}
+      <div className="bg-gradient-to-r from-amber-700 via-yellow-600 to-amber-700 text-white text-center py-4 px-6 rounded-lg mb-6 shadow-lg">
+        <h3 className="text-2xl font-bold tracking-wider" style={{ fontFamily: 'serif' }}>
+          THE ARCHIVE OF SELFLESS WISHES
+        </h3>
+      </div>
 
-                    return (
-                      <div
-                        key={hour}
-                        className="absolute text-2xl font-bold text-gray-800"
-                        style={{
-                          left: `calc(50% + ${x}px - 12px)`,
-                          top: `calc(50% + ${y}px - 12px)`,
-                        }}
-                      >
-                        {hour}
-                      </div>
-                    );
-                  })}
+      {/* Lore Card */}
+      <div className="bg-amber-50 border-4 border-amber-600 rounded-lg p-6 mb-8 shadow-inner">
+        <p className="text-gray-800 leading-relaxed text-lg italic">
+          "You stand before the Five Legendary Letters — the most selfless wishes ever received
+          in the 1,600-year history of the North Pole Post Office.
+        </p>
+        <p className="text-gray-800 leading-relaxed text-lg italic mt-4">
+          When the Ancient Elves designed the Ultimate Lockdown Protocol, they chose these letters
+          as the first key. They believed that only those who truly understand the spirit of
+          Christmas — that giving matters more than receiving — would be worthy of unlocking the workshop.
+        </p>
+        <p className="text-gray-800 leading-relaxed text-lg italic mt-4">
+          These children asked for nothing for themselves. Their wishes live eternally in our Archive.
+          And hidden within them... is the first code.
+        </p>
+        <p className="text-gray-800 leading-relaxed text-lg font-bold mt-4 text-center">
+          Find the connection. The code is a 5-letter word."
+        </p>
+      </div>
 
-                  {/* Clock hands */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Hour hand pointing to 12 */}
-                    <div
-                      className="absolute bg-gray-800 rounded-full origin-bottom"
-                      style={{
-                        width: '8px',
-                        height: '50px',
-                        bottom: '50%',
-                        transform: 'rotate(0deg)',
-                      }}
-                    />
-                    {/* Minute hand pointing to 12 */}
-                    <div
-                      className="absolute bg-gray-600 rounded-full origin-bottom"
-                      style={{
-                        width: '4px',
-                        height: '70px',
-                        bottom: '50%',
-                        transform: 'rotate(0deg)',
-                      }}
-                    />
-                    {/* Center dot */}
-                    <div className="absolute w-6 h-6 bg-christmas-red rounded-full"></div>
+      {/* The Five Letters */}
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold text-christmas-green mb-4 text-center">
+          The Five Legendary Letters
+        </h3>
+
+        <div className="space-y-4">
+          {legendaryLetters.map((letter) => (
+            <div
+              key={letter.id}
+              className="bg-gradient-to-b from-amber-100 to-amber-50 border-2 border-amber-500 rounded-lg overflow-hidden shadow-lg"
+            >
+              {/* Brass Nameplate */}
+              <div
+                className="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 px-4 py-3 cursor-pointer hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 transition-all"
+                onClick={() => setExpandedLetter(expandedLetter === letter.id ? null : letter.id)}
+              >
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div className="text-amber-950 font-bold">
+                    <span className="text-lg">{letter.name}</span>
+                    <span className="text-amber-800 ml-2">Age {letter.age}</span>
+                  </div>
+                  <div className="text-amber-950 text-right">
+                    <span className="font-semibold">{letter.hometown}, {letter.state}</span>
+                    <span className="text-amber-800 ml-3">December {letter.year}</span>
                   </div>
                 </div>
+                <div className="text-amber-800 text-sm mt-1 text-center">
+                  {expandedLetter === letter.id ? '[ Click to collapse ]' : '[ Click to read letter ]'}
+                </div>
               </div>
+
+              {/* Letter Content */}
+              {expandedLetter === letter.id && (
+                <div className="p-6 bg-amber-50">
+                  <div
+                    className="bg-gradient-to-b from-yellow-50 to-amber-100 p-6 rounded border border-amber-300 shadow-inner"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    <pre className="whitespace-pre-wrap text-gray-800 text-lg leading-relaxed">
+                      {letter.content}
+                    </pre>
+                  </div>
+                </div>
+              )}
             </div>
-
-            <p className="mt-6 text-xl font-bold text-christmas-gold">
-              ⏰ The Ancient Timekeeper shows the hour of completion
-            </p>
-            <p className="text-gray-400 italic mt-2">
-              "Speak the name of the hour to break the seal..."
-            </p>
-          </div>
+          ))}
         </div>
+      </div>
 
-        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-          <p className="text-gray-700">
-            <span className="font-bold">📜 Ancient Elf Inscription:</span> "The first seal opens not with numbers, but with the <span className="italic">word</span> that names the hour. When both hands point skyward to the number of completeness, speak its ancient name."
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-6">
-          <label className="block text-lg font-bold text-gray-700 mb-2">
-            🔐 Enter the Ancient Word:
+      {/* Answer Input */}
+      <form onSubmit={handleSubmit} className="mt-8">
+        <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg p-6 shadow-xl">
+          <label className="block text-xl font-bold text-christmas-gold mb-3 text-center">
+            Enter the 5-Letter Code:
           </label>
           <div className="flex gap-3">
             <input
               type="text"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Speak the hour's name..."
+              placeholder="Enter code..."
               className="input-field flex-1 text-center text-2xl uppercase tracking-widest"
-              maxLength={20}
+              maxLength={10}
               disabled={showSuccess}
             />
             <button
               type="submit"
-              className="btn-primary px-12"
+              className="btn-primary px-8"
               disabled={showSuccess || !answer.trim()}
             >
-              {showSuccess ? '✅ Unlocked!' : '🔓 Submit'}
+              {showSuccess ? 'Unlocked!' : 'Submit'}
             </button>
           </div>
 
           {error && (
-            <p className="text-red-600 font-bold mt-2 text-center bg-red-50 border border-red-300 rounded p-3 text-lg">{error}</p>
+            <p className="text-red-400 font-bold mt-3 text-center">{error}</p>
           )}
 
           {showSuccess && (
-            <p className="text-green-600 font-bold mt-2 text-center animate-pulse text-xl">
-              🎉 The First Seal is broken! The Toy Factory door unlocks...
+            <p className="text-green-400 font-bold mt-3 text-center animate-pulse text-lg">
+              The Archive glows with approval. The first seal is broken...
             </p>
           )}
-        </form>
+        </div>
+      </form>
 
-        <HintSystem roomKey="room1" />
-      </div>
+      <HintSystem roomKey="room1" />
     </div>
   )
 }
