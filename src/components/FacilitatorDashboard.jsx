@@ -417,6 +417,159 @@ export default function FacilitatorDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Answer Cards Section */}
+        <div className="mt-6">
+          <div className="bg-slate-700 rounded-xl p-6 shadow-xl">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Puzzle Answer Cards
+              <span className="text-sm font-normal text-slate-400 ml-2">(click to flip)</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <AnswerCard
+                roomNum={1}
+                roomName="Mail Room"
+                icon="✉️"
+                answer="CANDY"
+                walkthrough={[
+                  "5 legendary letters on display",
+                  "Each letter has a child's hometown on the brass nameplate",
+                  "Take first letter of each hometown (oldest to newest):",
+                  "• Clara - Caramel Creek (C)",
+                  "• Amir - Anchorage (A)",
+                  "• Nina - Nashville (N)",
+                  "• Diego - Denver (D)",
+                  "• Yuki - Yakima (Y)",
+                  "Answer: C-A-N-D-Y"
+                ]}
+              />
+              <AnswerCard
+                roomNum={2}
+                roomName="Toy Factory"
+                icon="🧸"
+                answer="BELLS"
+                walkthrough={[
+                  "PHASE 1 - Identify carols:",
+                  "• Belt 1: Silver Bells",
+                  "• Belt 2: Little Drummer Boy",
+                  "• Belt 3: Here Comes Santa Claus",
+                  "• Belt 4: 12 Days of Christmas",
+                  "• Belt 5: Frosty the Snowman",
+                  "PHASE 2 - 5th word → letter:",
+                  "• Silver Bells → \"it's\" → L",
+                  "• Drummer Boy → \"me\" → S",
+                  "• Here Comes Santa → \"here\" → E",
+                  "• 12 Days → \"christmas\" → B",
+                  "• Frosty → \"was\" → L",
+                  "Unscramble L-S-E-B-L = BELLS"
+                ]}
+              />
+              <AnswerCard
+                roomNum={3}
+                roomName="Reindeer Stable"
+                icon="🦌"
+                answer="RUDOLPH"
+                walkthrough={[
+                  "8 reindeer stalls shown",
+                  "But formation board has 9 positions",
+                  "The classic 8: Dasher, Dancer, Prancer, Vixen, Comet, Cupid, Donner, Blitzen",
+                  "Who's missing? The 9th reindeer added in 1939",
+                  "Answer: RUDOLPH"
+                ]}
+              />
+              <AnswerCard
+                roomNum={4}
+                roomName="Cookie Kitchen"
+                icon="🍪"
+                answer="TREATS"
+                walkthrough={[
+                  "Mrs. Claus's recipe card",
+                  "Each ingredient has a quantity number",
+                  "Number = which letter position to use:",
+                  "• 3 cups BUTTER → 3rd letter = T",
+                  "• 4 cups SUGAR → 4th letter = R",
+                  "• 3 tbsp HONEY → 3rd letter = E",
+                  "• 4 cups CREAM → 4th letter = A",
+                  "• 3 tsp NUTMEG → 3rd letter = T",
+                  "• 4 EGGS → 4th letter = S",
+                  "Answer: T-R-E-A-T-S"
+                ]}
+              />
+              <AnswerCard
+                roomNum={5}
+                roomName="Santa's Office"
+                icon="🎅"
+                answer="MAGIC"
+                walkthrough={[
+                  "Review of all rooms completed",
+                  "Each room taught a 'lesson'",
+                  "Lessons have highlighted words:",
+                  "• Room 1: Memories",
+                  "• Room 2: Artistry",
+                  "• Room 3: Guide",
+                  "• Room 4: Ingredients",
+                  "• Room 5: Claus",
+                  "First letters: M-A-G-I-C"
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Flippable Answer Card Component
+function AnswerCard({ roomNum, roomName, icon, answer, walkthrough }) {
+  const [isFlipped, setIsFlipped] = useState(false)
+
+  return (
+    <div
+      className="relative h-64 cursor-pointer perspective-1000"
+      onClick={() => setIsFlipped(!isFlipped)}
+    >
+      <div
+        className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d ${
+          isFlipped ? 'rotate-y-180' : ''
+        }`}
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+        }}
+      >
+        {/* Front of card */}
+        <div
+          className="absolute w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg border-2 border-slate-500 flex flex-col items-center justify-center shadow-lg"
+          style={{ backfaceVisibility: 'hidden' }}
+        >
+          <span className="text-5xl mb-3">{icon}</span>
+          <p className="text-xl font-bold text-white">Room {roomNum}</p>
+          <p className="text-slate-300">{roomName}</p>
+          <p className="text-slate-400 text-sm mt-4">Click to reveal</p>
+        </div>
+
+        {/* Back of card */}
+        <div
+          className="absolute w-full h-full bg-gradient-to-br from-green-700 to-green-900 rounded-lg border-2 border-green-500 p-4 overflow-y-auto shadow-lg"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)'
+          }}
+        >
+          <div className="text-center mb-2">
+            <p className="text-green-300 text-sm">{roomName}</p>
+            <p className="text-3xl font-bold text-white tracking-widest">{answer}</p>
+          </div>
+          <hr className="border-green-500 mb-2" />
+          <div className="text-xs text-green-100 space-y-1">
+            {walkthrough.map((step, i) => (
+              <p key={i} className={step.startsWith('•') ? 'pl-2' : 'font-semibold'}>
+                {step}
+              </p>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

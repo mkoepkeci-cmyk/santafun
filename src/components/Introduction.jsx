@@ -232,7 +232,7 @@ export default function Introduction() {
         {/* Facilitator link */}
         <div className="mt-6 text-center">
           <a
-            href="/facilitator"
+            href="/#/facilitator"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-500 hover:text-christmas-burgundy underline transition-colors"
