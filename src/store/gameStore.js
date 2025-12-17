@@ -8,7 +8,7 @@ export const useGameStore = create(
       // Game state
       teamName: '',
       currentRoom: -1, // -1 = intro story, 0 = team name, 1-5 = rooms, 6 = completion
-      timeRemaining: 3600, // 60 minutes in seconds
+      timeRemaining: 1800, // 30 minutes in seconds
       startTime: null,
       completionTime: null,
       gameStarted: false,
@@ -129,7 +129,7 @@ export const useGameStore = create(
       resetGame: () => set({
         teamName: '',
         currentRoom: -1,
-        timeRemaining: 3600,
+        timeRemaining: 1800,
         startTime: null,
         completionTime: null,
         gameStarted: false,

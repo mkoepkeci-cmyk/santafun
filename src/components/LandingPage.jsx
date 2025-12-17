@@ -105,7 +105,7 @@ export default function LandingPage() {
             </p>
             <p className="text-gray-600 font-body flex items-center justify-center gap-2">
               <span className="text-2xl">🧩</span>
-              <span>5 Puzzles • 60 Minutes • 1 Christmas to Save</span>
+              <span>5 Puzzles • 30 Minutes • 1 Christmas to Save</span>
             </p>
           </div>
         </div>

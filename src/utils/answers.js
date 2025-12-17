@@ -17,17 +17,15 @@ export const HINTS = {
   room2: [
     "Stage 1: Identify which Christmas carol each conveyor belt represents from the toys shown",
     "Stage 2: Look up the lyrics for each carol and find the 5th word. Enter it to reveal a letter",
-    "Stage 3: The revealed letters (L, S, E, B, L) can be rearranged to spell: BELLS"
+    "Stage 3: Rearrange the revealed letters to spell a festive 5-letter word"
   ],
   room3: [
-    "The Ancient Elves knew the original eight by heart. But the formation has evolved since 1939...",
-    "Count the stalls. Count the positions on the board. Something doesn't add up.",
-    "Who guides the sleigh when the night is dark and stormy? Who was added to lead them all? RUDOLPH"
+    "Each clue describes a reindeer's personality or ability. Think about what each name means — DASHER dashes, DANCER dances, PRANCER prances...",
+    "Some trickier ones: VIXEN means a clever female fox. COMET streaks across the sky. DONNER means 'thunder' in German, BLITZEN means 'lightning'."
   ],
   room4: [
     "Mrs. Claus's recipe holds the key. The quantity numbers aren't just for measuring...",
-    "Each quantity tells you which letter position to look at in that ingredient's name. 3 cups of BUTTER? Look at the 3rd letter: T.",
-    "Extract each letter: BU(T)TER, SUGA(R), HON(E)Y, CRE(A)M, NU(T)MEG, EGG(S) = TREATS"
+    "Each quantity tells you which letter position to look at in that ingredient's name. 3 cups of BUTTER? Look at the 3rd letter: T."
   ],
   room5: [
     "The Ancient Elves loved wordplay. Look carefully at how each room's lesson is described — the answer is woven into the words themselves.",

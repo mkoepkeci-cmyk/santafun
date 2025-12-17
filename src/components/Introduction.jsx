@@ -137,9 +137,9 @@ export default function Introduction() {
 
           <div className={`transition-all duration-700 ${currentParagraph >= 6 ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
             <p className="text-lg leading-relaxed">
-              Here's the problem: it's now <span className="font-bold text-christmas-red">11:00 PM</span>.
+              Here's the problem: it's now <span className="font-bold text-christmas-red">11:30 PM</span>.
               Santa's sleigh <span className="font-bold">must</span> launch by <span className="font-bold text-christmas-red">midnight</span> to
-              complete the global delivery route on time. That gives us exactly <span className="font-bold text-2xl text-christmas-red">60 minutes</span>.
+              complete the global delivery route on time. That gives us exactly <span className="font-bold text-2xl text-christmas-red">30 minutes</span>.
             </p>
           </div>
 

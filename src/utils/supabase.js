@@ -18,6 +18,9 @@ export const supabase = isConfigured
   ? createClient(supabaseUrl, supabaseKey)
   : null
 
+// Export configuration status for UI components
+export const isSupabaseConfigured = () => isConfigured
+
 // ============================================
 // ORIGINAL TEAM COMPLETION (standalone mode)
 // ============================================

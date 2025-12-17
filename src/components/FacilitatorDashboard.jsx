@@ -9,7 +9,8 @@ import {
   denyHintRequest,
   subscribeToGameState,
   subscribeToAllTeams,
-  subscribeToAllHintRequests
+  subscribeToAllHintRequests,
+  isSupabaseConfigured
 } from '../utils/supabase'
 import { HINTS } from '../utils/answers'
 
@@ -23,6 +24,8 @@ export default function FacilitatorDashboard() {
   const [teams, setTeams] = useState([])
   const [hintRequests, setHintRequests] = useState([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const supabaseReady = isSupabaseConfigured()
 
   // Check if already authenticated (stored in sessionStorage)
   useEffect(() => {
@@ -67,7 +70,7 @@ export default function FacilitatorDashboard() {
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault()
-    if (password === FACILITATOR_PASSWORD) {
+    if (password.toLowerCase() === FACILITATOR_PASSWORD.toLowerCase()) {
       setIsAuthenticated(true)
       sessionStorage.setItem('facilitator_auth', 'true')
       setPasswordError('')
@@ -124,8 +127,21 @@ export default function FacilitatorDashboard() {
 
   // Handle Start Game
   const handleStartGame = async () => {
+    if (!supabaseReady) {
+      setError('Database not configured! Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to Vercel environment variables.')
+      return
+    }
+
     setLoading(true)
-    await startGameGlobal()
+    setError('')
+    const result = await startGameGlobal()
+
+    if (!result) {
+      setError('Failed to start game. Check console for details.')
+      setLoading(false)
+      return
+    }
+
     const state = await getGameState()
     setGameState(state)
     setLoading(false)

@@ -10,7 +10,6 @@ import {
 export default function HintSystem({ roomKey }) {
   const [showHints, setShowHints] = useState(false)
   const [pendingRequest, setPendingRequest] = useState(null)
-  const [approvedHints, setApprovedHints] = useState([])
   const { hintsUsed, useHint, liveTeamId } = useGameStore()
 
   const currentHints = hintsUsed[roomKey]
@@ -26,17 +25,25 @@ export default function HintSystem({ roomKey }) {
     const loadApprovedHints = async () => {
       const hints = await getApprovedHints(liveTeamId)
       const roomHints = hints.filter(h => h.room_key === roomKey)
-      setApprovedHints(roomHints)
 
-      // Auto-reveal approved hints
-      roomHints.forEach(hint => {
-        if (hint.hint_number > currentHints) {
-          // Use the hint in the store
-          for (let i = currentHints; i < hint.hint_number; i++) {
-            useHint(roomKey)
+      // Find the highest approved hint number for this room
+      const maxApprovedHint = roomHints.reduce((max, hint) =>
+        Math.max(max, hint.hint_number), 0
+      )
+
+      // Get current hints from store directly to avoid stale closure
+      const currentHintsFromStore = useGameStore.getState().hintsUsed[roomKey]
+
+      // Only update if we have more approved hints than currently revealed
+      if (maxApprovedHint > currentHintsFromStore) {
+        // Set hints directly to the max approved level instead of incrementing one by one
+        useGameStore.setState((state) => ({
+          hintsUsed: {
+            ...state.hintsUsed,
+            [roomKey]: maxApprovedHint
           }
-        }
-      })
+        }))
+      }
     }
 
     loadApprovedHints()
