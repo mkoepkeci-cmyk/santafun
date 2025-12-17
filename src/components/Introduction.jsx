@@ -85,7 +85,7 @@ export default function Introduction() {
           <div className="bg-white bg-opacity-60 rounded-lg p-3 inline-block">
             <p className="text-sm text-gray-700 font-semibold">📡 From: The North Pole Workshop</p>
             <p className="text-sm text-christmas-red font-bold">⚠️ Status: CODE RED - CHRISTMAS IN DANGER</p>
-            <p className="text-xs text-gray-600 mt-1">December 24th, 2024 • 11:00 PM</p>
+            <p className="text-xs text-gray-600 mt-1">December 24th, 2024 • 11:30 PM</p>
           </div>
         </div>
 

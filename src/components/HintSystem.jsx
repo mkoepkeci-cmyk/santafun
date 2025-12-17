@@ -63,9 +63,11 @@ export default function HintSystem({ roomKey }) {
     }
   }, [liveTeamId, roomKey])
 
+  const totalHints = availableHints.length
+
   // Standard mode - just reveal hint
   const handleUseHint = () => {
-    if (currentHints < 3) {
+    if (currentHints < totalHints) {
       useHint(roomKey)
     }
   }
@@ -90,7 +92,7 @@ export default function HintSystem({ roomKey }) {
         onClick={() => setShowHints(!showHints)}
         className="btn-secondary"
       >
-        💡 Hints ({currentHints}/3 used)
+        💡 Hints ({currentHints}/{totalHints} used)
       </button>
 
       {showHints && (
@@ -134,7 +136,7 @@ export default function HintSystem({ roomKey }) {
                   <button
                     onClick={handleUseHint}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-                    disabled={currentHints >= 3}
+                    disabled={currentHints >= totalHints}
                   >
                     Reveal Hint {index + 1}
                   </button>

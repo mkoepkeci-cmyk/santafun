@@ -25,7 +25,7 @@ export const HINTS = {
   ],
   room4: [
     "Mrs. Claus's recipe holds the key. The quantity numbers aren't just for measuring...",
-    "Each quantity tells you which letter position to look at in that ingredient's name. 3 cups of BUTTER? Look at the 3rd letter: T."
+    "Each quantity tells you which letter position to look at in that ingredient's name."
   ],
   room5: [
     "The Ancient Elves loved wordplay. Look carefully at how each room's lesson is described — the answer is woven into the words themselves.",
