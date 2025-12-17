@@ -3,7 +3,7 @@ import { useGameStore } from '../store/gameStore'
 import { saveTeamCompletion, getLeaderboard } from '../utils/supabase'
 
 export default function CompletionScreen() {
-  const { teamName, completionTime, hintsUsed, resetGame } = useGameStore()
+  const { teamName, completionTime, hintsUsed } = useGameStore()
   const [leaderboard, setLeaderboard] = useState([])
   const [saved, setSaved] = useState(false)
 
@@ -88,13 +88,6 @@ export default function CompletionScreen() {
             </table>
           </div>
         )}
-
-        <button
-          onClick={resetGame}
-          className="btn-primary"
-        >
-          🎮 Play Again
-        </button>
 
         <p className="mt-6 text-gray-600">
           Share your time with friends and challenge them to beat it!

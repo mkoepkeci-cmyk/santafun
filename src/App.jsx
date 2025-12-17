@@ -3,7 +3,6 @@ import GameLayout from './components/GameLayout'
 import LandingPage from './components/LandingPage'
 import Introduction from './components/Introduction'
 import CompletionScreen from './components/CompletionScreen'
-import DevTools from './components/DevTools'
 import FacilitatorDashboard from './components/FacilitatorDashboard'
 
 // Import room components
@@ -60,12 +59,7 @@ function App() {
 
   // Show intro story or landing page without layout
   if (currentRoom === -1 || currentRoom === 0) {
-    return (
-      <>
-        <DevTools />
-        {renderRoom()}
-      </>
-    )
+    return renderRoom()
   }
 
   // Start timer when entering room 1
@@ -74,12 +68,9 @@ function App() {
   }
 
   return (
-    <>
-      <DevTools />
-      <GameLayout>
-        {renderRoom()}
-      </GameLayout>
-    </>
+    <GameLayout>
+      {renderRoom()}
+    </GameLayout>
   )
 }
 
