@@ -12,13 +12,14 @@ export default function Room4() {
   const { nextRoom, saveAnswer } = useGameStore()
 
   // Mrs. Claus's Recipe Card - quantity indicates which letter position to extract
+  // Scrambled order so letters don't spell TREATS when read top to bottom
   const recipeIngredients = [
-    { id: 1, ingredient: 'BUTTER', quantity: 3, unit: 'cups', letter: 'T', description: 'Salted, room temperature' },
-    { id: 2, ingredient: 'SUGAR', quantity: 5, unit: 'cups', letter: 'R', description: 'Pure cane sugar' },
     { id: 3, ingredient: 'HONEY', quantity: 4, unit: 'tbsp', letter: 'E', description: 'North Pole wildflower' },
-    { id: 4, ingredient: 'CREAM', quantity: 4, unit: 'cups', letter: 'A', description: 'Fresh from the dairy' },
-    { id: 5, ingredient: 'NUTMEG', quantity: 3, unit: 'tsp', letter: 'T', description: 'Freshly grated' },
+    { id: 1, ingredient: 'BUTTER', quantity: 3, unit: 'cups', letter: 'T', description: 'Salted, room temperature' },
     { id: 6, ingredient: 'EGGS', quantity: 4, unit: 'large', letter: 'S', description: 'Farm fresh' },
+    { id: 4, ingredient: 'CREAM', quantity: 4, unit: 'cups', letter: 'A', description: 'Fresh from the dairy' },
+    { id: 2, ingredient: 'SUGAR', quantity: 5, unit: 'cups', letter: 'R', description: 'Pure cane sugar' },
+    { id: 5, ingredient: 'NUTMEG', quantity: 3, unit: 'tsp', letter: 'T', description: 'Freshly grated' },
   ]
 
   const handleLetterClick = (ingredient, clickedIndex) => {
@@ -184,40 +185,35 @@ export default function Room4() {
           </table>
         </div>
 
-        {/* Revealed Letters Display */}
+        {/* Revealed Letters Display - Scrambled order */}
         <div className="mt-6 bg-amber-200 rounded-lg p-4 border-2 border-amber-500">
           <p className="text-center text-amber-900 font-bold mb-3">
             Hidden Letters Revealed: {revealedCount}/6
           </p>
           <div className="flex justify-center gap-3">
-            {recipeIngredients.map((item) => (
-              <div
-                key={item.id}
-                className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl font-bold shadow-lg ${
-                  revealedLetters[item.id]
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-amber-300 border-2 border-dashed border-amber-400'
-                }`}
-              >
-                {revealedLetters[item.id] ? item.letter : '?'}
-              </div>
-            ))}
+            {/* Display in scrambled order: positions 3,1,5,2,6,4 (T,T,S,R,A,E scrambled from TREATS) */}
+            {[3, 1, 5, 2, 6, 4].map((id) => {
+              const item = recipeIngredients.find(i => i.id === id)
+              return (
+                <div
+                  key={id}
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl font-bold shadow-lg ${
+                    revealedLetters[id]
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-amber-300 border-2 border-dashed border-amber-400'
+                  }`}
+                >
+                  {revealedLetters[id] ? item.letter : '?'}
+                </div>
+              )
+            })}
           </div>
           {revealedCount === 6 && (
             <p className="text-center text-green-700 font-bold mt-3 animate-pulse">
-              ✨ All letters revealed! What word do they spell? ✨
+              ✨ All letters revealed! Unscramble them to find the secret word! ✨
             </p>
           )}
         </div>
-      </div>
-
-      {/* Decoder Hint */}
-      <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-        <p className="text-blue-800 text-center">
-          <span className="font-bold">🔍 The Cipher:</span> The quantity number tells you which letter
-          to extract from each ingredient name. For example, if an ingredient has quantity "3",
-          look at the 3rd letter of that ingredient's name.
-        </p>
       </div>
 
       {/* Answer Input */}
