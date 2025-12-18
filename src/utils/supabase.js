@@ -66,6 +66,25 @@ export const getLeaderboard = async (limit = 10) => {
   }
 }
 
+// Clear the leaderboard (delete all teams from standalone mode)
+export const clearLeaderboard = async () => {
+  if (!supabase) return null
+
+  try {
+    const { error } = await supabase
+      .from('teams')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all rows
+
+    if (error) throw error
+    console.log('Leaderboard cleared')
+    return { success: true }
+  } catch (error) {
+    console.error('Error clearing leaderboard:', error)
+    return null
+  }
+}
+
 // ============================================
 // GLOBAL GAME STATE (simplified - no session codes)
 // ============================================
@@ -154,6 +173,9 @@ export const endGameGlobal = async () => {
         }
       }
     }
+
+    // Clear the leaderboard (teams table) for fresh game
+    await clearLeaderboard()
 
     // Reset game state
     const { data, error } = await supabase
