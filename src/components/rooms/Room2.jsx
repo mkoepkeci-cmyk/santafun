@@ -43,31 +43,31 @@ export default function Room2() {
     conveyor1: {
       carolAnswers: ['silver bells', 'silverbells'],
       carol: 'Silver Bells',
-      fifthWord: ["it's", 'its'],
+      fourthWord: ['sidewalks'],
       letter: 'L'
     },
     conveyor2: {
       carolAnswers: ['little drummer boy', 'drummer boy'],
       carol: 'Little Drummer Boy',
-      fifthWord: ['me'],
+      fourthWord: ['me'],
       letter: 'S'
     },
     conveyor3: {
       carolAnswers: ['here comes santa claus', 'here comes santa'],
       carol: 'Here Comes Santa Claus',
-      fifthWord: ['here'],
+      fourthWord: ['claus'],
       letter: 'E'
     },
     conveyor4: {
       carolAnswers: ['12 days of christmas', 'twelve days of christmas', '12 days'],
       carol: '12 Days of Christmas',
-      fifthWord: ['christmas'],
+      fourthWord: ['day'],
       letter: 'B'
     },
     conveyor5: {
       carolAnswers: ['frosty the snowman', 'frosty'],
       carol: 'Frosty the Snowman',
-      fifthWord: ['was'],
+      fourthWord: ['was'],
       letter: 'L'
     }
   }
@@ -93,15 +93,15 @@ export default function Room2() {
     const userWord = cipherWords[conveyorId].toLowerCase().trim()
     const correct = correctAnswers[conveyorId]
 
-    if (correct.fifthWord.some(word => word === userWord)) {
-      // Correct 5th word! Reveal the letter
+    if (correct.fourthWord.some(word => word === userWord)) {
+      // Correct 4th word! Reveal the letter
       setLettersRevealed({
         ...lettersRevealed,
         [conveyorId]: true
       })
       setError('')
     } else {
-      setError(`❌ Not the right word for ${correct.carol}. Check the 5th word carefully...`)
+      setError(`❌ Not the right word for ${correct.carol}. Check the 4th word carefully...`)
       setTimeout(() => setError(''), 3000)
     }
   }
@@ -261,7 +261,7 @@ export default function Room2() {
             </h3>
             <p className="text-center text-gray-700 mb-4">
               The ancient mechanism has activated! To decode each carol's cipher letter, you must consult the song scrolls.<br />
-              <span className="font-bold">Find the 5th word from each carol's opening verse</span> and enter it below.
+              <span className="font-bold">Find the 4th word from each carol's opening verse</span> and enter it below.
             </p>
 
             <div className="space-y-4">
@@ -293,7 +293,7 @@ export default function Room2() {
                                 handleCipherWordSubmit(conveyorId)
                               }
                             }}
-                            placeholder="Enter the 5th word..."
+                            placeholder="Enter the 4th word..."
                             className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
                             disabled={showSuccess}
                           />
@@ -380,7 +380,7 @@ export default function Room2() {
 
         <div className="bg-amber-50 border-2 border-amber-400 rounded-lg p-4 mb-6">
           <p className="text-gray-700">
-            <span className="font-bold">💡 Hint:</span> Three stages: 1) Identify the carols from the toys. 2) Look up each carol's lyrics and find the 5th word. 3) Unscramble the revealed letters to spell a festive word!
+            <span className="font-bold">💡 Hint:</span> Three stages: 1) Identify the carols from the toys. 2) Look up each carol's lyrics and find the 4th word. 3) Unscramble the revealed letters to spell a festive word!
           </p>
         </div>
 

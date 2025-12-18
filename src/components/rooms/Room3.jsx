@@ -13,8 +13,8 @@ export default function Room3() {
 
   // Only the 8 reindeer - RUDOLPH is pre-filled as leader
   const nameplates = [
-    'DASHER', 'DANCER', 'PRANCER', 'VIXEN',
-    'COMET', 'CUPID', 'DONNER', 'BLITZEN'
+    'BLITZEN', 'CUPID', 'PRANCER', 'DASHER',
+    'VIXEN', 'DONNER', 'COMET', 'DANCER'
   ]
 
   const stalls = [
