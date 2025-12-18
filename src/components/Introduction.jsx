@@ -177,7 +177,7 @@ export default function Introduction() {
               </ul>
               <div className="mt-4 pt-4 border-t-2 border-white/30">
                 <p className="text-center text-xl">
-                  <span className="font-bold">Time Limit:</span> <span className="text-christmas-gold text-2xl font-bold">60 Minutes</span>
+                  <span className="font-bold">Time Limit:</span> <span className="text-christmas-gold text-2xl font-bold">30 Minutes</span>
                 </p>
                 <p className="text-center text-lg mt-2">
                   <span className="font-bold">Stakes:</span> Christmas for the entire world
