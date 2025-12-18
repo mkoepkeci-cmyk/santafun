@@ -21,12 +21,22 @@ export default function Room4() {
     { id: 6, ingredient: 'EGGS', quantity: 4, unit: 'large', letter: 'S', description: 'Farm fresh' },
   ]
 
-  const handleIngredientClick = (ingredient) => {
-    if (!showSuccess) {
+  const handleLetterClick = (ingredient, clickedIndex) => {
+    if (showSuccess || revealedLetters[ingredient.id]) return
+
+    const correctIndex = ingredient.quantity - 1
+
+    if (clickedIndex === correctIndex) {
+      // Correct letter clicked!
       setRevealedLetters(prev => ({
         ...prev,
-        [ingredient.id]: !prev[ingredient.id]
+        [ingredient.id]: true
       }))
+      setError('')
+    } else {
+      // Wrong letter clicked
+      setError(`Wrong letter! The quantity tells you which position to look at...`)
+      setTimeout(() => setError(''), 2000)
     }
   }
 
@@ -91,7 +101,7 @@ export default function Room4() {
           themselves. Each quantity points to a letter hiding within its ingredient.
         </p>
         <p className="text-gray-800 leading-relaxed font-bold mt-4 text-center">
-          Click each ingredient row to reveal its hidden letter!"
+          Click the correct letter in each ingredient name to reveal the hidden code!"
         </p>
       </div>
 
@@ -115,7 +125,7 @@ export default function Room4() {
               </tr>
             </thead>
             <tbody>
-              {recipeIngredients.map((item, index) => {
+              {recipeIngredients.map((item) => {
                 const isRevealed = revealedLetters[item.id]
                 // Highlight the letter at the quantity position
                 const letterIndex = item.quantity - 1
@@ -124,12 +134,9 @@ export default function Room4() {
                 return (
                   <tr
                     key={item.id}
-                    onClick={() => handleIngredientClick(item)}
-                    className={`border-t-2 border-amber-200 cursor-pointer transition-all ${
-                      isRevealed
-                        ? 'bg-green-100 hover:bg-green-200'
-                        : 'hover:bg-amber-100'
-                    } ${showSuccess ? 'cursor-default' : ''}`}
+                    className={`border-t-2 border-amber-200 transition-all ${
+                      isRevealed ? 'bg-green-100' : ''
+                    }`}
                   >
                     <td className="p-4">
                       <span className={`text-2xl font-bold ${isRevealed ? 'text-green-700' : 'text-amber-800'}`}>
@@ -142,10 +149,13 @@ export default function Room4() {
                         {ingredientLetters.map((letter, idx) => (
                           <span
                             key={idx}
-                            className={`text-xl font-bold ${
+                            onClick={() => !isRevealed && !showSuccess && handleLetterClick(item, idx)}
+                            className={`text-xl font-bold px-2 py-1 rounded transition-all ${
                               isRevealed && idx === letterIndex
-                                ? 'bg-green-600 text-white px-2 py-1 rounded animate-pulse'
-                                : 'text-amber-900'
+                                ? 'bg-green-600 text-white animate-pulse'
+                                : isRevealed
+                                  ? 'text-amber-900'
+                                  : 'text-amber-900 hover:bg-amber-200 cursor-pointer'
                             }`}
                           >
                             {letter}
