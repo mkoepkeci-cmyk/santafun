@@ -161,7 +161,23 @@ export const useGameStore = create(
         hintsUsed: state.hintsUsed,
         answers: state.answers,
         liveTeamId: state.liveTeamId
-      })
+      }),
+      // Reset game on refresh if on completion screen
+      onRehydrateStorage: () => (state) => {
+        if (state && state.currentRoom === 6) {
+          // Game was completed - reset to intro on refresh
+          state.teamName = ''
+          state.currentRoom = -1
+          state.timeRemaining = 1800
+          state.startTime = null
+          state.completionTime = null
+          state.gameStarted = false
+          state.viewedIntro = false
+          state.liveTeamId = null
+          state.hintsUsed = { room1: 0, room2: 0, room3: 0, room4: 0, room5: 0 }
+          state.answers = { room1: '', room2: '', room3: '', room4: '', room5: '' }
+        }
+      }
     }
   )
 )
