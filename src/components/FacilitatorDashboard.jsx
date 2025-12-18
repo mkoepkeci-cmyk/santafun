@@ -340,7 +340,7 @@ export default function FacilitatorDashboard() {
                             ) : team.start_time ? (
                               <div>
                                 <p className="text-slate-400 text-sm">Elapsed</p>
-                                <ElapsedTimer startTime={team.start_time} />
+                                <ElapsedTimer startTime={team.start_time} completionTime={team.completion_time} />
                               </div>
                             ) : (
                               <p className="text-slate-400">Not started</p>
@@ -591,11 +591,17 @@ function AnswerCard({ roomNum, roomName, icon, answer, walkthrough }) {
   )
 }
 
-// Elapsed time component that updates every second
-function ElapsedTimer({ startTime }) {
+// Elapsed time component that updates every second (stops if completionTime is set)
+function ElapsedTimer({ startTime, completionTime }) {
   const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
+    // If already completed, don't run the timer
+    if (completionTime) {
+      setElapsed(completionTime)
+      return
+    }
+
     const start = new Date(startTime).getTime()
 
     const updateElapsed = () => {
@@ -607,7 +613,7 @@ function ElapsedTimer({ startTime }) {
     const interval = setInterval(updateElapsed, 1000)
 
     return () => clearInterval(interval)
-  }, [startTime])
+  }, [startTime, completionTime])
 
   const mins = Math.floor(elapsed / 60)
   const secs = elapsed % 60
